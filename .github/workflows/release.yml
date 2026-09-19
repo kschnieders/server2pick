@@ -1,0 +1,91 @@
+name: Release
+
+# Zwei Wege zur fertigen Exe:
+#   1. Tag pushen  -> git tag v0.2.1 && git push origin v0.2.1
+#   2. Von Hand    -> Actions > Release > "Run workflow", Version eintippen
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version inklusive v, z. B. v0.2.1"
+        required: true
+        default: "v0.2.1"
+
+# Der Job legt eine Release an und hängt den Installer dran.
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    # server2pick ist Windows-only: die Firewall-Regeln laufen über PowerShell.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version bestimmen
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.version }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "number=${TAG#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Version in die Manifeste schreiben
+        shell: bash
+        # Den Dateinamen des Installers bestimmt tauri.conf.json, nicht der Tag.
+        # Ohne diesen Schritt hieße die Datei aus Tag v0.3.0 weiterhin 0.2.0.
+        run: |
+          node -e "
+            const fs = require('fs');
+            const version = '${{ steps.version.outputs.number }}';
+            for (const file of ['package.json', 'src-tauri/tauri.conf.json']) {
+              const json = JSON.parse(fs.readFileSync(file, 'utf8'));
+              json.version = version;
+              fs.writeFileSync(file, JSON.stringify(json, null, 2) + '\n');
+            }
+            console.log('Version gesetzt:', version);
+          "
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust-Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Tests
+        run: npm run test:share
+
+      - name: Bauen und veröffentlichen
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ steps.version.outputs.tag }}
+          releaseName: server2pick ${{ steps.version.outputs.tag }}
+          releaseBody: |
+            **Installer:** `server2pick_${{ steps.version.outputs.number }}_x64-setup.exe`
+
+            Windows meldet beim Start „Unbekannter Herausgeber“ — die App ist
+            nicht signiert, dafür bräuchte es ein gekauftes Zertifikat. Über
+            *Weitere Informationen → Trotzdem ausführen* geht es weiter.
+
+            Zum Blockieren fragt die App einmal nach Administratorrechten; die
+            Ping-Messung läuft auch ohne.
+          releaseDraft: false
+          prerelease: false
