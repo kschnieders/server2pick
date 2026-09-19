@@ -15,6 +15,10 @@ struct SystemState {
     games: Vec<games::GameInfo>,
     /// Every rule this app currently owns, across all games.
     rules: Vec<firewall::ActiveRule>,
+    /// Unix milliseconds of the last rule write, per game id. Held against
+    /// `GameInfo::running_since`, it answers the question the rule count cannot:
+    /// whether the session on screen is actually running under those rules.
+    applied_at: std::collections::HashMap<String, i64>,
     /// Set when the firewall could not be queried.
     error: Option<String>,
 }
@@ -44,6 +48,12 @@ async fn ping_round(targets: Vec<ping::PingTarget>) -> Vec<ping::PingResult> {
 async fn system_state(app: tauri::AppHandle) -> SystemState {
     let settings = store::load(&app);
 
+    let applied_at = settings
+        .games
+        .iter()
+        .filter_map(|(id, g)| g.applied_at.map(|ts| (id.clone(), ts)))
+        .collect();
+
     let game_list = tokio::task::spawn_blocking(move || {
         games::list(&|id| settings.game_path(id))
     })
@@ -60,6 +70,7 @@ async fn system_state(app: tauri::AppHandle) -> SystemState {
         elevated: firewall::is_elevated(),
         games: game_list,
         rules,
+        applied_at,
         error,
     }
 }
@@ -84,6 +95,7 @@ async fn apply_blocks(
 
     let mut entry = settings.game(&game);
     entry.last_blocked = applied.clone();
+    entry.applied_at = Some(store::now_millis());
     settings.games.insert(game, entry);
     let _ = store::save(&app, &settings);
 
@@ -103,11 +115,13 @@ async fn clear_blocks(app: tauri::AppHandle, game: Option<String>) -> Result<(),
         Some(id) => {
             let mut entry = settings.game(&id);
             entry.last_blocked.clear();
+            entry.applied_at = None;
             settings.games.insert(id, entry);
         }
         None => {
             for entry in settings.games.values_mut() {
                 entry.last_blocked.clear();
+                entry.applied_at = None;
             }
         }
     }

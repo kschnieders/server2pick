@@ -29,8 +29,8 @@
     "active": true,
     "targets": ["nsis"],
     "publisher": "Kay Schnieders",
-    "shortDescription": "Serverauswahl für Deadlock, CS2, Dota 2 und TF2",
-    "longDescription": "Zeigt die Valve-Relay-Standorte je Spiel mit Live-Ping und blockiert die unerwünschten per Windows-Firewall — pro Spiel getrennt, weil jede Regel an dessen Programm gebunden ist.",
+    "shortDescription": "Server picker for Deadlock, CS2, Dota 2 and TF2",
+    "longDescription": "Lists Valve's relay locations per game with live ping and blocks the unwanted ones through the Windows firewall — separately per game, because every rule is bound to that game's executable.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

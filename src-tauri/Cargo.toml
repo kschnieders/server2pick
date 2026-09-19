@@ -1,7 +1,7 @@
 [package]
 name = "server2pick"
 version = "0.1.0"
-description = "Serverauswahl fuer Steam-Datagram-Relay-Spiele"
+description = "Server picker for Steam Datagram Relay games"
 authors = ["Kay Schnieders"]
 edition = "2021"
 
@@ -32,6 +32,7 @@ windows-sys = { version = "0.60", features = [
   "Win32_NetworkManagement_IpHelper",
   "Win32_Networking_WinSock",
   "Win32_Security",
+  "Win32_System_Diagnostics_ToolHelp",
   "Win32_System_Threading",
   "Win32_UI_Shell",
   "Win32_UI_WindowsAndMessaging",

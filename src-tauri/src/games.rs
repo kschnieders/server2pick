@@ -7,7 +7,7 @@
 //! possibly do anything.
 
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 
 pub struct GameDef {
@@ -65,6 +65,39 @@ pub fn find(id: &str) -> Option<&'static GameDef> {
     GAMES.iter().find(|g| g.id == id)
 }
 
+#[cfg(all(test, windows))]
+mod tests {
+    /// The FILETIME epoch is 1601, the one the UI compares against is 1970.
+    /// Getting that offset wrong would not fail loudly — it would just hand out
+    /// a wrong verdict forever, so the arithmetic gets checked against a clock.
+    #[test]
+    fn start_times_are_plausible_unix_millis() {
+        let now = crate::store::now_millis();
+        let processes = super::running_processes();
+
+        assert!(
+            !processes.is_empty(),
+            "the test runner itself should show up in the snapshot"
+        );
+
+        let known: Vec<i64> = processes.values().filter_map(|v| *v).collect();
+        assert!(!known.is_empty(), "no process gave up its start time");
+
+        for started in known {
+            // 2020-01-01, comfortably before any machine this runs on booted.
+            assert!(
+                started > 1_577_836_800_000,
+                "start time {started} predates the epoch offset being right"
+            );
+            // A second of slack: the clock is read after the snapshot.
+            assert!(
+                started <= now + 1_000,
+                "start time {started} lies in the future (now {now})"
+            );
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct GameInfo {
@@ -75,6 +108,14 @@ pub struct GameInfo {
     pub installed: bool,
     pub path: Option<String>,
     pub running: bool,
+    /// Unix milliseconds the running process started. `None` when the game is
+    /// not running, or when Windows refused to hand out its start time.
+    ///
+    /// Compared against the moment the rules were written, this is what says
+    /// whether a session is actually running under them: the firewall never
+    /// tears down connections that already exist, so a game that was up before
+    /// the rules keeps its old relay until it restarts.
+    pub running_since: Option<i64>,
     /// Accepted executable file names, so the UI can flag a manual pick that
     /// points at the wrong program.
     pub exe_names: Vec<String>,
@@ -155,20 +196,95 @@ pub fn find_executable(game: &GameDef) -> Option<String> {
     None
 }
 
-/// One `tasklist` call covers every game — spawning four would be wasteful for
-/// something that only feeds a status line.
-fn running_processes() -> HashSet<String> {
-    #[cfg(windows)]
-    {
-        if let Ok(out) = crate::firewall::run_hidden("tasklist", &["/NH", "/FO", "CSV"]) {
-            return out
-                .lines()
-                .filter_map(|l| l.split('"').nth(1))
-                .map(|n| n.to_lowercase())
-                .collect();
+/// Turns a Win32 `FILETIME` — 100 ns ticks since 1601 — into unix milliseconds.
+#[cfg(windows)]
+fn filetime_to_unix_millis(ft: windows_sys::Win32::Foundation::FILETIME) -> i64 {
+    const EPOCH_DIFF_MS: i64 = 11_644_473_600_000;
+    let ticks = ((ft.dwHighDateTime as u64) << 32) | ft.dwLowDateTime as u64;
+    (ticks / 10_000) as i64 - EPOCH_DIFF_MS
+}
+
+/// Every running process by lowercased executable name, mapped to when it
+/// started. One snapshot covers every game — and unlike shelling out to
+/// `tasklist`, it spawns nothing, which matters for something that polls next
+/// to a running match.
+///
+/// The start time needs a handle on the process, and Windows can refuse that
+/// one (a game running elevated while we are not). The name is still in the
+/// snapshot, so such a process counts as running with an unknown start time.
+#[cfg(windows)]
+fn running_processes() -> HashMap<String, Option<i64>> {
+    use windows_sys::Win32::Foundation::{CloseHandle, FILETIME, INVALID_HANDLE_VALUE};
+    use windows_sys::Win32::System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, Process32FirstW, Process32NextW, PROCESSENTRY32W,
+        TH32CS_SNAPPROCESS,
+    };
+    use windows_sys::Win32::System::Threading::{
+        GetProcessTimes, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION,
+    };
+
+    let mut found: HashMap<String, Option<i64>> = HashMap::new();
+
+    unsafe {
+        let snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if snapshot == INVALID_HANDLE_VALUE {
+            return found;
         }
+
+        let mut entry: PROCESSENTRY32W = std::mem::zeroed();
+        entry.dwSize = std::mem::size_of::<PROCESSENTRY32W>() as u32;
+
+        let mut ok = Process32FirstW(snapshot, &mut entry) != 0;
+        while ok {
+            let len = entry
+                .szExeFile
+                .iter()
+                .position(|&c| c == 0)
+                .unwrap_or(entry.szExeFile.len());
+            let name = String::from_utf16_lossy(&entry.szExeFile[..len]).to_lowercase();
+
+            let mut started = None;
+            let handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, entry.th32ProcessID);
+            if !handle.is_null() {
+                let mut created: FILETIME = std::mem::zeroed();
+                let mut ignored: [FILETIME; 3] = std::mem::zeroed();
+                if GetProcessTimes(
+                    handle,
+                    &mut created,
+                    &mut ignored[0],
+                    &mut ignored[1],
+                    &mut ignored[2],
+                ) != 0
+                {
+                    started = Some(filetime_to_unix_millis(created));
+                }
+                CloseHandle(handle);
+            }
+
+            // Several instances of the same executable: keep the oldest, since
+            // that is the one most likely to predate the rules.
+            found
+                .entry(name)
+                .and_modify(|current| {
+                    *current = match (*current, started) {
+                        (Some(a), Some(b)) => Some(a.min(b)),
+                        _ => None,
+                    };
+                })
+                .or_insert(started);
+
+            ok = Process32NextW(snapshot, &mut entry) != 0;
+        }
+
+        CloseHandle(snapshot);
     }
-    HashSet::new()
+
+    found
+}
+
+#[cfg(not(windows))]
+fn running_processes() -> HashMap<String, Option<i64>> {
+    HashMap::new()
 }
 
 /// Describes every known game: installed, where, and whether it is running.
@@ -183,6 +299,22 @@ pub fn list(overrides: &dyn Fn(&str) -> Option<String>) -> Vec<GameInfo> {
                 .filter(|p| !p.trim().is_empty())
                 .or_else(|| find_executable(game));
 
+            // A game may answer to more than one executable name (TF2). The
+            // earliest start wins: if any of them predates the rules, the
+            // session does.
+            let live: Vec<Option<i64>> = game
+                .process_names
+                .iter()
+                .filter_map(|n| processes.get(&n.to_lowercase()).copied())
+                .collect();
+            // One unreadable start time makes the whole answer unknown — a
+            // guess here would be a green light we cannot back up.
+            let running_since = if live.iter().any(|s| s.is_none()) {
+                None
+            } else {
+                live.iter().filter_map(|s| *s).min()
+            };
+
             GameInfo {
                 id: game.id.to_string(),
                 name: game.name.to_string(),
@@ -190,10 +322,8 @@ pub fn list(overrides: &dyn Fn(&str) -> Option<String>) -> Vec<GameInfo> {
                 appid: game.appid,
                 installed: path.is_some(),
                 path,
-                running: game
-                    .process_names
-                    .iter()
-                    .any(|n| processes.contains(&n.to_lowercase())),
+                running: !live.is_empty(),
+                running_since,
                 exe_names: game.process_names.iter().map(|n| n.to_string()).collect(),
             }
         })

@@ -25,6 +25,17 @@ pub struct GameSettings {
     pub presets: Vec<Preset>,
     /// Last selection, so the UI can restore it before the firewall is queried.
     pub last_blocked: Vec<String>,
+    /// Unix milliseconds of the last successful rule write for this game.
+    /// Survives restarts on purpose — so do the firewall rules.
+    pub applied_at: Option<i64>,
+}
+
+/// Wall clock in unix milliseconds, in the same unit as a process start time.
+pub fn now_millis() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis() as i64)
+        .unwrap_or(0)
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

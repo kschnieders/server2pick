@@ -43,6 +43,8 @@ export const de = {
   "warn.tooFew":
     "Nur noch {count} Standorte frei. Valves Relay-Netz sucht sich dann Umwege — Matches brechen häufiger ab. Lass mindestens {min} offen.",
   "warn.loadFailed": "Relay-Liste nicht ladbar: {error}",
+  "warn.staleRules":
+    "{game} lief schon, als die Regeln geschrieben wurden. Windows lässt bestehende Verbindungen weiterlaufen — das Spiel bleibt auf seinem alten Relay, bis du es neu startest.",
 
   "list.active": "{allowed}/{total} aktiv",
   "list.allOn": "alle an",
@@ -74,6 +76,14 @@ export const de = {
   "sidebar.yes": "ja",
   "sidebar.no": "nein",
   "sidebar.rulesActive": "Regeln aktiv",
+  "sidebar.rulesInEffect": "Regeln greifen",
+  "sidebar.effect.none": "—",
+  "sidebar.effect.idle": "beim nächsten Start",
+  "sidebar.effect.live": "ja",
+  "sidebar.effect.stale": "erst nach Neustart",
+  "sidebar.effect.unknown": "unbekannt",
+  "sidebar.staleHint":
+    "Starte {game} neu, damit die Sperren wirken. Ohne Neustart behält die laufende Sitzung das Relay, über das sie reingekommen ist.",
   "sidebar.elevationHint":
     "Pings laufen auch ohne Adminrechte. Zum Blockieren braucht Windows erhöhte Rechte für die Firewall.",
   "sidebar.alsoBlocked": "Auch gesperrt: {games}",
@@ -129,6 +139,8 @@ export const de = {
 
   "notice.cleared": "Alle Standorte für {game} wieder freigegeben.",
   "notice.blocked": "{count} Standorte für {game} blockiert.",
+  "notice.blockedRunning":
+    "{count} Standorte blockiert — {game} läuft aber schon. Greift erst nach einem Neustart des Spiels.",
   "notice.rulesCleared": "Firewall-Regeln für {game} entfernt.",
   "notice.allRulesCleared": "Firewall-Regeln aller Spiele entfernt.",
 

@@ -9,12 +9,15 @@ import type {
   SystemState,
 } from "../api";
 import { useT, type TranslationKey } from "../i18n";
+import type { RuleEffect } from "../lib/rule-effect";
 
 type Props = {
   pops: Pop[];
   blocked: Set<string>;
   sys: SystemState | null;
   game: GameInfo | null;
+  /** Whether the applied rules reach the running session. */
+  effect: RuleEffect;
   gameSettings: GameSettings;
   /** Active rule counts per game id, for the cross-game overview. */
   ruleCounts: Record<string, number>;
@@ -79,6 +82,7 @@ export function Sidebar({
   blocked,
   sys,
   game,
+  effect,
   gameSettings,
   ruleCounts,
   settings,
@@ -100,6 +104,16 @@ export function Sidebar({
   const otherGames = (sys?.games ?? []).filter(
     (g) => g.id !== game?.id && (ruleCounts[g.id] ?? 0) > 0,
   );
+
+  // Only a session that started under the rules earns the green "yes" — every
+  // other answer says what is missing instead of implying it is fine.
+  const effectTone = {
+    none: "muted",
+    idle: "muted",
+    live: "ok",
+    stale: "warn",
+    unknown: "muted",
+  }[effect] as "ok" | "warn" | "muted";
 
   const pickExecutable = async () => {
     const picked = await open({
@@ -168,16 +182,29 @@ export function Sidebar({
           value={t(game?.installed ? "sidebar.found" : "sidebar.notFound")}
           tone={game?.installed ? "ok" : "warn"}
         />
+        {/* A running game is a fact, not a problem — the line below is the one
+            that judges it. */}
         <StatusLine
           label={t("sidebar.gameRunning")}
           value={t(game?.running ? "sidebar.yes" : "sidebar.no")}
-          tone={game?.running ? "warn" : "muted"}
+          tone="muted"
         />
         <StatusLine
           label={t("sidebar.rulesActive")}
           value={`${game ? (ruleCounts[game.id] ?? 0) : 0}`}
           tone={game && (ruleCounts[game.id] ?? 0) > 0 ? "bad" : "muted"}
         />
+        <StatusLine
+          label={t("sidebar.rulesInEffect")}
+          value={t(`sidebar.effect.${effect}` as TranslationKey)}
+          tone={effectTone}
+        />
+
+        {effect === "stale" && (
+          <p className="mt-2 rounded-lg bg-amber-glow/10 p-2 text-[11px] leading-relaxed text-amber-glow">
+            {t("sidebar.staleHint", { game: game?.name ?? "" })}
+          </p>
+        )}
 
         {!sys?.elevated && (
           <p className="mt-2 rounded-lg bg-ink-850 p-2 text-[11px] leading-relaxed text-ink-400">

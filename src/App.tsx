@@ -22,6 +22,7 @@ import {
   translateError,
 } from "./i18n";
 import { pushRound, statsFor, type History } from "./lib/ping-stats";
+import { ruleEffect } from "./lib/rule-effect";
 import { applyShare, decodeShare, encodeShare } from "./lib/share-code";
 
 /** Steam Datagram Relay reroutes around blocked POPs. Leaving too few open is
@@ -48,9 +49,10 @@ export default function App() {
   const [pingedGame, setPingedGame] = useState<string | null>(null);
 
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<{ text: string; bad?: boolean } | null>(
-    null,
-  );
+  const [notice, setNotice] = useState<{
+    text: string;
+    tone?: "ok" | "warn" | "bad";
+  } | null>(null);
   const [busy, setBusy] = useState(false);
   const [mapVisible, setMapVisible] = useState(true);
   const [splashTimedOut, setSplashTimedOut] = useState(false);
@@ -93,6 +95,34 @@ export default function App() {
   }, [blocked, appliedBlocked]);
 
   const allowedCount = pops.length - blocked.size;
+
+  /** Whether the rules reach the session that is running right now. */
+  const effect = useMemo(
+    () => ruleEffect(game, sys, appliedBlocked.size),
+    [game, sys, appliedBlocked],
+  );
+
+  /** Everything worth a permanent bar under the header, worst first. Stacked
+   *  rather than one slot, so a failed load cannot hide a stale ruleset. */
+  const warnings = useMemo(() => {
+    const list: { text: string; bad?: boolean }[] = [];
+
+    if (loadError) {
+      list.push({
+        text: t("warn.loadFailed", { error: translateError(t, loadError) }),
+        bad: true,
+      });
+    }
+    if (effect === "stale") {
+      list.push({ text: t("warn.staleRules", { game: game?.name ?? "" }) });
+    }
+    if (pops.length > 0 && allowedCount < MIN_SAFE_ALLOWED) {
+      list.push({
+        text: t("warn.tooFew", { count: allowedCount, min: MIN_SAFE_ALLOWED }),
+      });
+    }
+    return list;
+  }, [loadError, effect, game, pops.length, allowedCount, t]);
 
   const refreshSystem = useCallback(async () => {
     try {
@@ -313,18 +343,25 @@ export default function App() {
         .filter((p) => blocked.has(p.id))
         .map((p) => ({ pop: p.id, ips: p.ips }));
       await api.applyBlocks(gameId, rules);
-      await refreshSystem();
-      setNotice({
-        text:
-          rules.length === 0
-            ? t("notice.cleared", { game: game?.name ?? "" })
-            : t("notice.blocked", {
-                count: rules.length,
-                game: game?.name ?? "",
-              }),
-      });
+      // The fresh state decides the wording: rules written while the game is up
+      // do not reach it, and saying so now is the whole point of the check.
+      const state = await refreshSystem();
+      const stillRunning =
+        state?.games.find((g) => g.id === gameId)?.running ?? false;
+      const name = game?.name ?? "";
+
+      if (rules.length === 0) {
+        setNotice({ text: t("notice.cleared", { game: name }) });
+      } else if (stillRunning) {
+        setNotice({
+          text: t("notice.blockedRunning", { count: rules.length, game: name }),
+          tone: "warn",
+        });
+      } else {
+        setNotice({ text: t("notice.blocked", { count: rules.length, game: name }) });
+      }
     } catch (e) {
-      setNotice({ text: translateError(t, e), bad: true });
+      setNotice({ text: translateError(t, e), tone: "bad" });
     } finally {
       setBusy(false);
     }
@@ -344,7 +381,7 @@ export default function App() {
             : t("notice.rulesCleared", { game: game?.name ?? "" }),
       });
     } catch (e) {
-      setNotice({ text: translateError(t, e), bad: true });
+      setNotice({ text: translateError(t, e), tone: "bad" });
     } finally {
       setBusy(false);
     }
@@ -354,7 +391,7 @@ export default function App() {
     try {
       await api.elevate();
     } catch (e) {
-      setNotice({ text: translateError(t, e), bad: true });
+      setNotice({ text: translateError(t, e), tone: "bad" });
     }
   };
 
@@ -431,9 +468,11 @@ export default function App() {
           {notice && (
             <div
               className={`max-w-sm truncate rounded-lg px-3 py-1.5 text-xs ${
-                notice.bad
+                notice.tone === "bad"
                   ? "bg-rose-glow/15 text-rose-glow"
-                  : "bg-teal-glow/15 text-teal-glow"
+                  : notice.tone === "warn"
+                    ? "bg-amber-glow/15 text-amber-glow"
+                    : "bg-teal-glow/15 text-teal-glow"
               }`}
               title={notice.text}
             >
@@ -487,22 +526,18 @@ export default function App() {
           }
         />
 
-        {(loadError || (pops.length > 0 && allowedCount < MIN_SAFE_ALLOWED)) && (
+        {warnings.map((warning) => (
           <div
+            key={warning.text}
             className={`shrink-0 px-5 py-2 text-xs ${
-              loadError
+              warning.bad
                 ? "bg-rose-glow/10 text-rose-glow"
                 : "bg-amber-glow/10 text-amber-glow"
             }`}
           >
-            {loadError
-              ? t("warn.loadFailed", { error: translateError(t, loadError) })
-              : t("warn.tooFew", {
-                  count: allowedCount,
-                  min: MIN_SAFE_ALLOWED,
-                })}
+            {warning.text}
           </div>
-        )}
+        ))}
 
         {/* The explicit row track matters: an implicit `auto` row would be sized
             by the taller column, so neither side would ever scroll — both would
@@ -539,6 +574,7 @@ export default function App() {
               blocked={blocked}
               sys={sys}
               game={game}
+              effect={effect}
               gameSettings={gameSettings}
               ruleCounts={ruleCounts}
               settings={settings}

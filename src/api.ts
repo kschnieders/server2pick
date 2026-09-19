@@ -30,6 +30,9 @@ export type GameInfo = {
   installed: boolean;
   path: string | null;
   running: boolean;
+  /** Unix ms the process started; `null` when it is not running or Windows
+   *  would not say. */
+  runningSince: number | null;
   /** Accepted executable file names for this game. */
   exeNames: string[];
 };
@@ -43,6 +46,8 @@ export type SystemState = {
   elevated: boolean;
   games: GameInfo[];
   rules: ActiveRule[];
+  /** Unix ms of the last rule write, per game id. */
+  appliedAt: Record<string, number>;
   error: string | null;
 };
 
@@ -55,6 +60,8 @@ export type GameSettings = {
   gamePath: string | null;
   presets: Preset[];
   lastBlocked: string[];
+  /** Unix ms of the last rule write; the backend owns this. */
+  appliedAt: number | null;
 };
 
 export type Settings = {
@@ -70,6 +77,7 @@ export const EMPTY_GAME_SETTINGS: GameSettings = {
   gamePath: null,
   presets: [],
   lastBlocked: [],
+  appliedAt: null,
 };
 
 export const DEFAULT_SETTINGS: Settings = {

@@ -19,6 +19,41 @@ server2pick lists every location for the game you pick, measures its latency
 continuously, and blocks the ones you do not want with outbound Windows
 Firewall rules. Blocked location, skipped region.
 
+## How a match finds you
+
+```mermaid
+flowchart LR
+    pc["Your PC<br/>deadlock.exe"]
+    fw["server2pick<br/>firewall rules"]
+    okpops["Open locations<br/>Sterling · Chicago"]
+    nopops["Blocked locations<br/>Frankfurt · Stockholm"]
+    mm["Valve<br/>matchmaking"]
+    srv["Game server<br/>in a data centre"]
+
+    pc --> fw
+    fw -->|"1 · pings"| okpops
+    fw -.->|"dropped"| nopops
+    okpops -->|"2 · latencies"| mm
+    mm -->|"3 · places it"| srv
+    okpops ==>|"4 · route in"| srv
+```
+
+1. Your game pings every location. The firewall rules drop the ones you closed.
+2. So only the open ones come back with a number, and that is all your client
+   can report.
+3. Valve picks a data centre that suits all ten players in the lobby.
+4. You reach the server through an open relay — the thick line is the match
+   itself.
+
+Two decisions, not one: where the match is **hosted**, and where you **enter**
+the network. Only the second is yours. That is the whole mechanism — it works
+by starving the matchmaker of data, not by forbidding anything.
+
+Which is why it is not absolute. With enough European players in the lobby,
+Frankfurt can still win, and you would then reach that server through whatever
+relay you left open. The Steam overlay names both lines separately, so
+*"Game server in Stockholm, relayed via Frankfurt"* is a normal thing to read.
+
 ## One blocklist per game
 
 The relay pool is shared: Deadlock's 141 relay IPs are a subset of CS2's 210
@@ -37,6 +72,11 @@ sit on Europe while CS2 keeps North America open, both active at the same time.
 3. **Apply changes.** Windows asks for administrator rights once — the
    *Restart as admin* button sits in the sidebar.
 4. Save combinations you use often as **profiles**.
+
+Applying while the game is already open does not reach it: Windows leaves
+existing connections alone, so the running session keeps the relay it started
+on. The status card says which of the two you are looking at — *Rules in
+effect* reads **yes** only once the game has been started under them.
 
 Rules survive reboots. **Unblock** clears the open game; the link in the status
 card clears every game at once.

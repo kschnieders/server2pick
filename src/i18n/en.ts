@@ -38,6 +38,8 @@ export const en: Dictionary = {
   "warn.tooFew":
     "Only {count} locations left open. Valve's relay network starts routing around them — matches will fail to confirm more often. Keep at least {min} open.",
   "warn.loadFailed": "Could not load the relay list: {error}",
+  "warn.staleRules":
+    "{game} was already running when the rules were written. Windows leaves existing connections alone — the game keeps the relay it started on until you restart it.",
 
   "list.active": "{allowed}/{total} active",
   "list.allOn": "all on",
@@ -69,6 +71,14 @@ export const en: Dictionary = {
   "sidebar.yes": "yes",
   "sidebar.no": "no",
   "sidebar.rulesActive": "Active rules",
+  "sidebar.rulesInEffect": "Rules in effect",
+  "sidebar.effect.none": "—",
+  "sidebar.effect.idle": "at next launch",
+  "sidebar.effect.live": "yes",
+  "sidebar.effect.stale": "after a restart",
+  "sidebar.effect.unknown": "unknown",
+  "sidebar.staleHint":
+    "Restart {game} for the blocks to bite. Until then the running session keeps the relay it came in through.",
   "sidebar.elevationHint":
     "Pings work without admin rights. Blocking needs elevated rights for the Windows firewall.",
   "sidebar.alsoBlocked": "Also blocked: {games}",
@@ -124,6 +134,8 @@ export const en: Dictionary = {
 
   "notice.cleared": "All locations for {game} allowed again.",
   "notice.blocked": "{count} locations blocked for {game}.",
+  "notice.blockedRunning":
+    "{count} locations blocked — but {game} is already running. Takes effect after you restart the game.",
   "notice.rulesCleared": "Firewall rules for {game} removed.",
   "notice.allRulesCleared": "Firewall rules for all games removed.",
 

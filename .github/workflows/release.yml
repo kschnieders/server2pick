@@ -69,7 +69,7 @@ jobs:
         run: npm ci
 
       - name: Tests
-        run: npm run test:share
+        run: npm test
 
       - name: Bauen und veröffentlichen
         uses: tauri-apps/tauri-action@v0
@@ -78,14 +78,16 @@ jobs:
         with:
           tagName: ${{ steps.version.outputs.tag }}
           releaseName: server2pick ${{ steps.version.outputs.tag }}
+          # Englisch, im Gegensatz zum Rest dieser Datei: diesen Text lesen die
+          # Leute auf der Releases-Seite, nicht wir.
           releaseBody: |
             **Installer:** `server2pick_${{ steps.version.outputs.number }}_x64-setup.exe`
 
-            Windows meldet beim Start „Unbekannter Herausgeber“ — die App ist
-            nicht signiert, dafür bräuchte es ein gekauftes Zertifikat. Über
-            *Weitere Informationen → Trotzdem ausführen* geht es weiter.
+            Windows says "Unknown publisher" on first launch — the app is not
+            code signed, and signing it would take a bought certificate. Carry
+            on via *More info → Run anyway*.
 
-            Zum Blockieren fragt die App einmal nach Administratorrechten; die
-            Ping-Messung läuft auch ohne.
+            Blocking asks for administrator rights once. Measuring ping works
+            without them.
           releaseDraft: false
           prerelease: false

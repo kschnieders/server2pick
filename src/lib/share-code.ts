@@ -1,4 +1,4 @@
-import type { GameSettings, Preset, Settings } from "../api";
+import { EMPTY_GAME_SETTINGS, type GameSettings, type Preset, type Settings } from "../api";
 
 /**
  * Encodes and decodes the shareable part of a configuration.
@@ -99,16 +99,15 @@ export function applyShare(settings: Settings, share: DecodedShare): Settings {
   const games: Record<string, GameSettings> = { ...settings.games };
 
   for (const [id, incoming] of Object.entries(share)) {
-    const existing = games[id] ?? {
-      gamePath: null,
-      presets: [],
-      lastBlocked: [],
-    };
+    const existing = games[id] ?? EMPTY_GAME_SETTINGS;
     const names = new Set(incoming.presets.map((p) => p.name));
 
     games[id] = {
       // Deliberately preserved: where the game lives is this machine's business.
       gamePath: existing.gamePath,
+      // A code never touches the firewall, so whatever was written there — and
+      // when — stays true.
+      appliedAt: existing.appliedAt,
       lastBlocked: incoming.blocked,
       presets: [
         ...existing.presets.filter((p) => !names.has(p.name)),
