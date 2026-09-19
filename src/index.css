@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink-950: #0b0d0f;
+  --color-ink-900: #111417;
+  --color-ink-850: #171a1e;
+  --color-ink-800: #1d2126;
+  --color-ink-700: #2a2f36;
+  --color-ink-600: #3a4049;
+  --color-ink-400: #7d8794;
+  --color-ink-300: #a3adba;
+  --color-ink-100: #e6eaef;
+
+  --color-amber-glow: #e8a33d;
+  --color-amber-deep: #b87718;
+  --color-teal-glow: #3ec7a8;
+  --color-rose-glow: #e5615e;
+
+  --font-sans: "Inter", "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Cascadia Mono", "Consolas", ui-monospace, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-ink-950);
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  overflow: hidden;
+  /* The window is a fixed desktop surface; text selection only gets in the way. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* A slim scrollbar keeps the dense server list from looking cluttered. */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--color-ink-700);
+  border-radius: 999px;
+  border: 3px solid var(--color-ink-950);
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-600);
+}
+
+@keyframes pulse-ring {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+/* Same idea, dialled down — this one runs on every open location at once. */
+@keyframes pulse-soft {
+  0% {
+    opacity: 0.28;
+    transform: scale(1);
+  }
+  65%,
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+
+/* A band of light drifting across the map. Values are SVG user units. */
+@keyframes map-sweep {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(500px);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
