@@ -118,4 +118,13 @@ restarts itself. A failed check stays silent — no network, no complaint.
   community servers.
 - Windows only.
 
+## License
+
+server2pick is MIT licensed — see [LICENSE](LICENSE). Use it, change it, ship
+it, sell it; keep the copyright notice with it and expect no warranty.
+
+That covers this project's own code. The libraries it is built on stay under
+their own licenses, all of them permissive; every component, its version and
+its notice is listed in [THIRD-PARTY-LICENSES.md](THIRD-PARTY-LICENSES.md).
+
 Unofficial. Not affiliated with Valve.

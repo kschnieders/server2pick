@@ -6,6 +6,7 @@ version = "0.2.0"
 description = "Server picker for Steam Datagram Relay games"
 authors = ["Kay Schnieders"]
 edition = "2021"
+license = "MIT"
 
 [lib]
 # The `_lib` suffix may seem redundant but it is necessary
