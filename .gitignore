@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Signaturschlüssel des Updaters. Die öffentliche Hälfte (*.key.pub) darf mit
+# ins Repo — sie steht ohnehin in tauri.conf.json. Die private endet auf .key
+# und darf es nie, auch nicht versehentlich über `git add .`.
+*.key
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

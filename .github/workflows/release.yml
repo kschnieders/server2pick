@@ -25,6 +25,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Beides bricht den Build sonst erst ganz am Ende ab — das Secret nach
+      # dem kompletten Rust-Build, der Platzhalter-Key sogar überhaupt nicht:
+      # das Release ginge raus und wäre für die Installierenden eine Sackgasse,
+      # weil ihre App keine Signatur mehr prüfen kann.
+      - name: Signaturschlüssel prüfen
+        shell: bash
+        env:
+          KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          fail=0
+          if [ -z "$KEY" ]; then
+            echo "::error::Secret TAURI_SIGNING_PRIVATE_KEY fehlt oder ist leer. Den kompletten Inhalt der .key-Datei unter Settings > Secrets and variables > Actions hinterlegen."
+            fail=1
+          fi
+          if grep -q 'PUBKEY_HIER_EINSETZEN' src-tauri/tauri.conf.json; then
+            echo "::error::In src-tauri/tauri.conf.json steht noch der Platzhalter statt des Public Key. Ein Release damit koennte nie wieder aktualisiert werden."
+            fail=1
+          fi
+          exit $fail
+
       - name: Version bestimmen
         id: version
         shell: bash
