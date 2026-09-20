@@ -88,6 +88,10 @@ export const en: Dictionary = {
   "quick.allowAll": "Allow all",
   "quick.invert": "Invert",
   "quick.onlyRegion": "only {region}",
+  "quick.byLatency": "By latency",
+  "quick.blockAbove": "block above {ms} ms",
+  "quick.blockAboveHint":
+    "Blocks every measured location above it and frees the ones below. Locations without a reading stay as they are.",
 
   "presets.title": "Profiles · {game}",
   "presets.empty":

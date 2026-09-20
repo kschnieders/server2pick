@@ -93,6 +93,10 @@ export const de = {
   "quick.allowAll": "Alles erlauben",
   "quick.invert": "Umkehren",
   "quick.onlyRegion": "nur {region}",
+  "quick.byLatency": "Nach Latenz",
+  "quick.blockAbove": "über {ms} ms sperren",
+  "quick.blockAboveHint":
+    "Sperrt alle gemessenen Standorte darüber und gibt die darunter frei. Standorte ohne Messwert bleiben, wie sie sind.",
 
   "presets.title": "Profile · {game}",
   "presets.empty":

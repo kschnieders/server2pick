@@ -599,6 +599,7 @@ export default function App() {
             <Sidebar
               pops={pops}
               blocked={blocked}
+              history={history}
               sys={sys}
               game={game}
               effect={effect}

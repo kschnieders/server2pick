@@ -88,6 +88,10 @@ export const ru: Dictionary = {
   "quick.allowAll": "Разрешить все",
   "quick.invert": "Инвертировать",
   "quick.onlyRegion": "только {region}",
+  "quick.byLatency": "По задержке",
+  "quick.blockAbove": "блокировать выше {ms} мс",
+  "quick.blockAboveHint":
+    "Блокирует все измеренные локации выше порога и освобождает те, что ниже. Локации без измерений остаются как есть.",
 
   "presets.title": "Профили · {game}",
   "presets.empty":

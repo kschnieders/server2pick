@@ -88,6 +88,10 @@ export const es: Dictionary = {
   "quick.allowAll": "Permitir todo",
   "quick.invert": "Invertir",
   "quick.onlyRegion": "solo {region}",
+  "quick.byLatency": "Por latencia",
+  "quick.blockAbove": "bloquear por encima de {ms} ms",
+  "quick.blockAboveHint":
+    "Bloquea todas las ubicaciones medidas por encima y libera las que estén por debajo. Las ubicaciones sin medición se quedan como están.",
 
   "presets.title": "Perfiles · {game}",
   "presets.empty":

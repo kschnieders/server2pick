@@ -9,11 +9,17 @@ import type {
   SystemState,
 } from "../api";
 import { useT, type TranslationKey } from "../i18n";
+import { statsFor, type History } from "../lib/ping-stats";
 import type { RuleEffect } from "../lib/rule-effect";
+
+/** Thresholds for the latency shortcuts, in milliseconds. */
+const LATENCY_STEPS = [50, 80, 120];
 
 type Props = {
   pops: Pop[];
   blocked: Set<string>;
+  /** Rolling ping samples per POP, for the latency shortcuts. */
+  history: History;
   sys: SystemState | null;
   game: GameInfo | null;
   /** Whether the applied rules reach the running session. */
@@ -80,6 +86,7 @@ function StatusLine({
 export function Sidebar({
   pops,
   blocked,
+  history,
   sys,
   game,
   effect,
@@ -171,6 +178,30 @@ export function Sidebar({
     onSelect(new Set(pops.filter((p) => !blocked.has(p.id)).map((p) => p.id)));
   const onlyRegion = (region: string) =>
     onSelect(new Set(pops.filter((p) => p.region !== region).map((p) => p.id)));
+
+  /** Average rather than the last round: one slow probe is not a bad route. */
+  const averageOf = (pop: Pop) => statsFor(history[pop.id])?.avg ?? null;
+
+  const hasMeasurements = pops.some((p) => averageOf(p) !== null);
+
+  /**
+   * Blocks everything slower than `ms` and frees everything at or below it.
+   *
+   * POPs without a reading keep whatever they are. A relay that never answers
+   * ICMP is not necessarily a bad route — some filter it while the game runs
+   * fine over them — so deciding either way would be a guess, and a guess here
+   * either drops a good location or hands back one the user shut off by hand.
+   */
+  const blockAbove = (ms: number) => {
+    const next = new Set(blocked);
+    for (const pop of pops) {
+      const avg = averageOf(pop);
+      if (avg === null) continue;
+      if (avg > ms) next.add(pop.id);
+      else next.delete(pop.id);
+    }
+    onSelect(next);
+  };
 
   const regions = [...new Set(pops.map((p) => p.region))];
 
@@ -278,6 +309,25 @@ export function Sidebar({
               })}
             </button>
           ))}
+        </div>
+
+        <div className="mt-2.5 border-t border-ink-800 pt-2.5">
+          <p className="mb-1.5 text-[10px] uppercase tracking-wider text-ink-600">
+            {t("quick.byLatency")}
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {LATENCY_STEPS.map((ms) => (
+              <button
+                key={ms}
+                onClick={() => blockAbove(ms)}
+                disabled={!hasMeasurements}
+                title={t("quick.blockAboveHint")}
+                className="rounded-md border border-ink-700 px-2 py-1 text-[11px] text-ink-300 transition-colors hover:border-amber-glow/60 hover:text-amber-glow disabled:opacity-40 disabled:hover:border-ink-700 disabled:hover:text-ink-300"
+              >
+                {t("quick.blockAbove", { ms })}
+              </button>
+            ))}
+          </div>
         </div>
       </Card>
 
