@@ -40,6 +40,10 @@
     "active": true,
     "targets": ["nsis"],
     "createUpdaterArtifacts": true,
+    "resources": {
+      "../LICENSE": "LICENSE",
+      "../THIRD-PARTY-LICENSES.md": "THIRD-PARTY-LICENSES.md"
+    },
     "publisher": "Kay Schnieders",
     "shortDescription": "Server picker for Deadlock, CS2, Dota 2 and TF2",
     "longDescription": "Lists Valve's relay locations per game with live ping and blocks the unwanted ones through the Windows firewall — separately per game, because every rule is bound to that game's executable.",
