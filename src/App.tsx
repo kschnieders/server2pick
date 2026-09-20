@@ -37,6 +37,9 @@ export default function App() {
   const [gameId, setGameId] = useState<string | null>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  // Building a code deflates it, which is async — so it lands in state rather
+  // than being computed while rendering the dialog.
+  const [shareCode, setShareCode] = useState<string | null>(null);
 
   const [pops, setPops] = useState<Pop[]>([]);
   const [revision, setRevision] = useState<number | null>(null);
@@ -253,6 +256,25 @@ export default function App() {
     return () => window.clearTimeout(id);
   }, [notice]);
 
+  // Rebuilt while the dialog is open so the code keeps matching what is on
+  // screen; a round that is overtaken by the next one drops its result.
+  useEffect(() => {
+    if (!shareOpen) {
+      setShareCode(null);
+      return;
+    }
+    let cancelled = false;
+    encodeShare(
+      settings,
+      gameId ? { game: gameId, blocked: [...blocked] } : undefined,
+    ).then((code) => {
+      if (!cancelled) setShareCode(code);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [shareOpen, settings, gameId, blocked]);
+
   const persist = useCallback(
     (next: Settings, refresh = false) => {
       setSettings(next);
@@ -298,8 +320,8 @@ export default function App() {
 
   /** Takes a friend's code: server selection and profiles only. */
   const importShare = useCallback(
-    (code: string) => {
-      const decoded = decodeShare(code);
+    async (code: string) => {
+      const decoded = await decodeShare(code);
       if (!decoded) return false;
 
       persist(applyShare(settings, decoded));
@@ -600,10 +622,7 @@ export default function App() {
 
         {shareOpen && (
           <ShareDialog
-            code={encodeShare(
-              settings,
-              gameId ? { game: gameId, blocked: [...blocked] } : undefined,
-            )}
+            code={shareCode}
             onImport={importShare}
             onClose={() => setShareOpen(false)}
           />

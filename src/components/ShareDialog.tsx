@@ -6,8 +6,9 @@ import {
 import { useT } from "../i18n";
 
 type Props = {
-  code: string;
-  onImport: (code: string) => boolean;
+  /** `null` while the code is still being built. */
+  code: string | null;
+  onImport: (code: string) => Promise<boolean>;
   onClose: () => void;
 };
 
@@ -25,6 +26,7 @@ export function ShareDialog({ code, onImport, onClose }: Props) {
   }, [onClose]);
 
   const copy = async () => {
+    if (!code) return;
     try {
       await writeText(code);
       setCopied(true);
@@ -44,8 +46,8 @@ export function ShareDialog({ code, onImport, onClose }: Props) {
     }
   };
 
-  const doImport = () => {
-    const ok = onImport(input);
+  const doImport = async () => {
+    const ok = await onImport(input);
     setStatus(ok ? "done" : "bad");
     if (ok) setInput("");
   };
@@ -79,14 +81,15 @@ export function ShareDialog({ code, onImport, onClose }: Props) {
         <div className="mb-4 flex gap-1.5">
           <textarea
             readOnly
-            value={code}
+            value={code ?? ""}
             rows={2}
             onFocus={(e) => e.currentTarget.select()}
             className="min-w-0 flex-1 resize-none rounded-md border border-ink-700 bg-ink-950 px-2 py-1.5 font-mono text-[10px] leading-relaxed text-ink-300 outline-none select-text"
           />
           <button
             onClick={copy}
-            className="shrink-0 self-start rounded-md bg-amber-glow px-3 py-1.5 text-xs font-semibold text-ink-950 transition-colors hover:bg-amber-glow/90"
+            disabled={!code}
+            className="shrink-0 self-start rounded-md bg-amber-glow px-3 py-1.5 text-xs font-semibold text-ink-950 transition-colors hover:bg-amber-glow/90 disabled:opacity-40"
           >
             {copied ? t("share.copied") : t("share.copy")}
           </button>
@@ -104,7 +107,7 @@ export function ShareDialog({ code, onImport, onClose }: Props) {
               setInput(e.target.value);
               setStatus("idle");
             }}
-            placeholder="S2P1-…"
+            placeholder="S2P2-…"
             className="min-w-0 flex-1 resize-none rounded-md border border-ink-700 bg-ink-950 px-2 py-1.5 font-mono text-[10px] leading-relaxed text-ink-100 outline-none transition-colors select-text placeholder:text-ink-600 focus:border-amber-glow/60"
           />
           <div className="flex shrink-0 flex-col gap-1">
