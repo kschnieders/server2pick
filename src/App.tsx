@@ -13,6 +13,7 @@ import { LoadingBar } from "./components/LoadingBar";
 import { ServerList } from "./components/ServerList";
 import { Sidebar } from "./components/Sidebar";
 import { ShareDialog } from "./components/ShareDialog";
+import { UpdateCard } from "./components/UpdateCard";
 import { Splash } from "./components/Splash";
 import { WorldMap } from "./components/WorldMap";
 import {
@@ -24,6 +25,7 @@ import {
 import { pushRound, statsFor, type History } from "./lib/ping-stats";
 import { ruleEffect } from "./lib/rule-effect";
 import { applyShare, decodeShare, encodeShare } from "./lib/share-code";
+import { useUpdater } from "./lib/updater";
 
 /** Steam Datagram Relay reroutes around blocked POPs. Leaving too few open is
  *  what turns "pick my region" into endless match-confirmation timeouts. */
@@ -62,6 +64,8 @@ export default function App() {
   /** Flips once the first load is through; from then on a game switch gets the
    *  slim bar instead of the full splash. */
   const [initialDone, setInitialDone] = useState(false);
+
+  const { state: updateState, install: installUpdate } = useUpdater();
 
   const language = settings.language ?? detectLanguage();
   const t = useMemo(() => makeTranslate(language), [language]);
@@ -590,7 +594,8 @@ export default function App() {
             </div>
           </div>
 
-          <div className="min-h-0 overflow-y-auto pr-1">
+          <div className="flex min-h-0 flex-col gap-3 overflow-y-auto pr-1">
+            <UpdateCard state={updateState} onInstall={installUpdate} />
             <Sidebar
               pops={pops}
               blocked={blocked}

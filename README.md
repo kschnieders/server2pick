@@ -87,8 +87,9 @@ than three are left.
 
 ## Sharing a setup
 
-**Share** produces a code like `S2P1-eyJ2IjoxLCJn…`. Anyone who pastes it gets
-the same server selection and the same profiles, for every game at once.
+**Share** produces a code like `S2P2-S0lNTMnJT86uK65M…`. Anyone who pastes it
+gets the same server selection and the same profiles, for every game at once.
+Codes written by older versions (`S2P1-…`) still import.
 
 Install paths, language and ping interval stay local: a code never overwrites
 where your games live, and it never touches the firewall on its own — the
@@ -101,6 +102,36 @@ Windows shows “Unknown publisher” — *More info → Run anyway*.
 
 Ping measurement works without administrator rights. Only the firewall part
 needs them, and the app asks when you first block something.
+
+## Updates
+
+On start the app asks GitHub whether a newer release exists. If there is one, a
+card appears above the status panel; installing is one click and the app
+restarts itself. A failed check stays silent — no network, no complaint.
+
+### Setting up the signing key (once, maintainers only)
+
+The updater only accepts releases signed with this project's key. It is *not*
+code signing — the “Unknown publisher” warning above is a separate matter.
+
+```bash
+npm run tauri signer generate -- -w minisign.key
+```
+
+1. Put the printed **public** key into `plugins.updater.pubkey` in
+   `src-tauri/tauri.conf.json`, replacing `PUBKEY_HIER_EINSETZEN`.
+2. Store the **private** key as the repository secret
+   `TAURI_SIGNING_PRIVATE_KEY`, and its password as
+   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
+3. Keep a copy of the private key somewhere outside GitHub.
+
+Point 3 matters: the key has to stay the same across every future release.
+Lose it and installations out in the world can never be updated again — the
+only way back is asking people to reinstall by hand.
+
+Until the public key is in place the app runs normally, it just never finds an
+update. Local `npm run tauri build` needs the two variables in the environment,
+because `createUpdaterArtifacts` is on; releases come from CI, which has them.
 
 ## Limits
 

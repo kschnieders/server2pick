@@ -1,6 +1,8 @@
 [package]
 name = "server2pick"
-version = "0.1.0"
+# Kept in step with package.json and tauri.conf.json — the updater compares
+# versions, so all three have to tell the same story.
+version = "0.2.0"
 description = "Server picker for Steam Datagram Relay games"
 authors = ["Kay Schnieders"]
 edition = "2021"
@@ -25,6 +27,11 @@ tokio = { version = "1", features = ["rt-multi-thread", "time", "macros"] }
 futures = "0.3"
 tauri-plugin-dialog = "2.7.3"
 tauri-plugin-clipboard-manager = "2.3.3"
+tauri-plugin-process = "2"
+
+# Desktop only: the updater has no mobile counterpart.
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.60", features = [

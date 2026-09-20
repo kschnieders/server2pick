@@ -25,9 +25,21 @@
       "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost"
     }
   },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://github.com/kschnieders/server2pick/releases/latest/download/latest.json"
+      ],
+      "pubkey": "PUBKEY_HIER_EINSETZEN",
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  },
   "bundle": {
     "active": true,
     "targets": ["nsis"],
+    "createUpdaterArtifacts": true,
     "publisher": "Kay Schnieders",
     "shortDescription": "Server picker for Deadlock, CS2, Dota 2 and TF2",
     "longDescription": "Lists Valve's relay locations per game with live ping and blocks the unwanted ones through the Windows firewall — separately per game, because every rule is bound to that game's executable.",

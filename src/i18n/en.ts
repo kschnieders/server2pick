@@ -160,4 +160,12 @@ export const en: Dictionary = {
   "error.E_SETTINGS_SAVE": "Settings could not be saved.",
   "error.E_SELF_PATH": "Could not determine this program's own path.",
   "error.unknown": "Unexpected error.",
+
+  "update.title": "Update",
+  "update.available": "Version {version} is available.",
+  "update.install": "Install now",
+  "update.downloading": "Downloading …",
+  "update.restarting": "Installing, the app will restart.",
+  "update.failed": "The update could not be installed.",
+  "update.retry": "Try again",
 };

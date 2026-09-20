@@ -165,6 +165,14 @@ export const de = {
   "error.E_SETTINGS_SAVE": "Einstellungen konnten nicht gespeichert werden.",
   "error.E_SELF_PATH": "Eigener Programmpfad nicht ermittelbar.",
   "error.unknown": "Unerwarteter Fehler.",
+
+  "update.title": "Update",
+  "update.available": "Version {version} ist verfügbar.",
+  "update.install": "Jetzt installieren",
+  "update.downloading": "Wird geladen …",
+  "update.restarting": "Installation läuft, das Programm startet neu.",
+  "update.failed": "Das Update ließ sich nicht installieren.",
+  "update.retry": "Erneut versuchen",
 } as const;
 
 export type TranslationKey = keyof typeof de;
