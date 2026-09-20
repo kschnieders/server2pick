@@ -182,17 +182,18 @@ export function Sidebar({
           value={t(game?.installed ? "sidebar.found" : "sidebar.notFound")}
           tone={game?.installed ? "ok" : "warn"}
         />
-        {/* A running game is a fact, not a problem — the line below is the one
-            that judges it. */}
+        {/* A running game is what the rules are for, so "yes" reads as green —
+            the line below still judges whether they reach that session. */}
         <StatusLine
           label={t("sidebar.gameRunning")}
           value={t(game?.running ? "sidebar.yes" : "sidebar.no")}
-          tone="muted"
+          tone={game?.running ? "ok" : "muted"}
         />
+        {/* Applied rules are the intended state, not a warning. */}
         <StatusLine
           label={t("sidebar.rulesActive")}
           value={`${game ? (ruleCounts[game.id] ?? 0) : 0}`}
-          tone={game && (ruleCounts[game.id] ?? 0) > 0 ? "bad" : "muted"}
+          tone={game && (ruleCounts[game.id] ?? 0) > 0 ? "ok" : "muted"}
         />
         <StatusLine
           label={t("sidebar.rulesInEffect")}
