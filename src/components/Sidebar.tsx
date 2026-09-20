@@ -94,6 +94,8 @@ export function Sidebar({
 }: Props) {
   const t = useT();
   const [presetName, setPresetName] = useState("");
+  /** The profile the user last clicked — only that one is highlighted. */
+  const [pickedProfile, setPickedProfile] = useState<string | null>(null);
 
   const isManualPath = Boolean(gameSettings.gamePath?.trim());
   const exeName = game?.path?.split(/[\\/]/).pop()?.toLowerCase();
@@ -137,13 +139,32 @@ export function Sidebar({
       preset,
     ].sort((a, b) => a.name.localeCompare(b.name));
     onGameSettings({ presets });
+    // A freshly saved profile holds exactly the current selection, so it is the
+    // one the user is on.
+    setPickedProfile(name);
     setPresetName("");
   };
 
-  const deletePreset = (name: string) =>
+  const deletePreset = (name: string) => {
+    if (name === pickedProfile) setPickedProfile(null);
     onGameSettings({
       presets: gameSettings.presets.filter((p) => p.name !== name),
     });
+  };
+
+  // Exactly the profile the user clicked is highlighted — two profiles with the
+  // same server set must not both light up. The selection still has to match it
+  // though, so changing a server or hitting a quick select drops the highlight
+  // instead of leaving a stale claim behind.
+  const isActiveProfile = (preset: Preset) =>
+    preset.name === pickedProfile &&
+    preset.blocked.length === blocked.size &&
+    preset.blocked.every((id) => blocked.has(id));
+
+  const pickProfile = (preset: Preset) => {
+    setPickedProfile(preset.name);
+    onSelect(new Set(preset.blocked));
+  };
 
   const allowAll = () => onSelect(new Set());
   const invert = () =>
@@ -267,28 +288,50 @@ export function Sidebar({
           </p>
         ) : (
           <ul className="mb-2 flex flex-col gap-1">
-            {gameSettings.presets.map((preset) => (
-              <li key={preset.name} className="flex items-center gap-1">
-                <button
-                  onClick={() => onSelect(new Set(preset.blocked))}
-                  className="min-w-0 flex-1 truncate rounded-md bg-ink-850 px-2 py-1.5 text-left text-xs text-ink-100 transition-colors hover:bg-ink-800"
-                >
-                  {preset.name}
-                  <span className="ml-1.5 text-[10px] text-ink-600">
-                    {t("presets.activeCount", {
-                      count: pops.length - preset.blocked.length,
-                    })}
-                  </span>
-                </button>
-                <button
-                  onClick={() => deletePreset(preset.name)}
-                  title={t("presets.delete")}
-                  className="rounded-md px-1.5 py-1.5 text-ink-600 transition-colors hover:text-rose-glow"
-                >
-                  ✕
-                </button>
-              </li>
-            ))}
+            {gameSettings.presets.map((preset) => {
+              const active = isActiveProfile(preset);
+
+              return (
+                <li key={preset.name} className="flex items-center gap-1">
+                  <button
+                    onClick={() => pickProfile(preset)}
+                    aria-pressed={active}
+                    className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-xs transition-colors ${
+                      active
+                        ? "bg-teal-glow/10 text-teal-glow ring-1 ring-inset ring-teal-glow/40"
+                        : "bg-ink-850 text-ink-100 hover:bg-ink-800"
+                    }`}
+                  >
+                    {/* A dot rather than colour alone, so the active profile is
+                        still obvious without relying on hue. */}
+                    <span
+                      className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                        active ? "bg-teal-glow" : "bg-ink-600"
+                      }`}
+                    />
+                    <span className="min-w-0 truncate">
+                      {preset.name}
+                      <span
+                        className={`ml-1.5 text-[10px] ${
+                          active ? "text-teal-glow/70" : "text-ink-600"
+                        }`}
+                      >
+                        {t("presets.activeCount", {
+                          count: pops.length - preset.blocked.length,
+                        })}
+                      </span>
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => deletePreset(preset.name)}
+                    title={t("presets.delete")}
+                    className="rounded-md px-1.5 py-1.5 text-ink-600 transition-colors hover:text-rose-glow"
+                  >
+                    ✕
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         )}
         <div className="flex gap-1">
