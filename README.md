@@ -109,30 +109,6 @@ On start the app asks GitHub whether a newer release exists. If there is one, a
 card appears above the status panel; installing is one click and the app
 restarts itself. A failed check stays silent — no network, no complaint.
 
-### Setting up the signing key (once, maintainers only)
-
-The updater only accepts releases signed with this project's key. It is *not*
-code signing — the “Unknown publisher” warning above is a separate matter.
-
-```bash
-npm run tauri signer generate -- -w minisign.key
-```
-
-1. Put the printed **public** key into `plugins.updater.pubkey` in
-   `src-tauri/tauri.conf.json`, replacing `PUBKEY_HIER_EINSETZEN`.
-2. Store the **private** key as the repository secret
-   `TAURI_SIGNING_PRIVATE_KEY`, and its password as
-   `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`.
-3. Keep a copy of the private key somewhere outside GitHub.
-
-Point 3 matters: the key has to stay the same across every future release.
-Lose it and installations out in the world can never be updated again — the
-only way back is asking people to reinstall by hand.
-
-Until the public key is in place the app runs normally, it just never finds an
-update. Local `npm run tauri build` needs the two variables in the environment,
-because `createUpdaterArtifacts` is on; releases come from CI, which has them.
-
 ## Limits
 
 - It blocks relays, not game servers — those are not public. In edge cases the

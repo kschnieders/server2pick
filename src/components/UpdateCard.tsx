@@ -29,14 +29,12 @@ export function UpdateCard({ state, onInstall }: Props) {
 
       {state.status === "available" && (
         <>
+          {/* Deliberately without the release notes: they are written for the
+              Releases page — installer file names, the "Unknown publisher"
+              hint — and arrive as raw Markdown that has nobody to render it. */}
           <p className="mb-2 text-[11px] leading-relaxed text-ink-300">
             {t("update.available", { version: state.version })}
           </p>
-          {state.notes && (
-            <p className="mb-2 max-h-24 overflow-y-auto whitespace-pre-line text-[11px] leading-relaxed text-ink-400">
-              {state.notes}
-            </p>
-          )}
           <button
             onClick={onInstall}
             className="w-full rounded-md bg-teal-glow px-3 py-1.5 text-xs font-semibold text-ink-950 transition-colors hover:bg-teal-glow/90"

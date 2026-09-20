@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useMemo } from "react";
 import { de, type Dictionary, type TranslationKey } from "./de";
 import { en } from "./en";
+import { es } from "./es";
+import { ru } from "./ru";
 
 /**
  * Adding a language takes two steps: copy `de.ts`, translate the values, then
@@ -10,6 +12,8 @@ import { en } from "./en";
 export const LANGUAGES: { code: string; dict: Dictionary }[] = [
   { code: "de", dict: de },
   { code: "en", dict: en },
+  { code: "es", dict: es },
+  { code: "ru", dict: ru },
 ];
 
 /** German is the source language and therefore the fallback for gaps. */

@@ -13,7 +13,7 @@ import { relaunch } from "@tauri-apps/plugin-process";
 
 export type UpdateState =
   | { status: "idle" }
-  | { status: "available"; version: string; notes: string | null }
+  | { status: "available"; version: string }
   /** `percent` stays null until the download reports a content length. */
   | { status: "downloading"; version: string; percent: number | null }
   | { status: "ready"; version: string }
@@ -31,11 +31,7 @@ export function useUpdater() {
         const found = await check();
         if (!found || cancelled) return;
         setUpdate(found);
-        setState({
-          status: "available",
-          version: found.version,
-          notes: found.body?.trim() || null,
-        });
+        setState({ status: "available", version: found.version });
       } catch {
         // Silence is the right answer here — see the note above.
       }
