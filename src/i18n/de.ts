@@ -85,7 +85,7 @@ export const de = {
   "sidebar.staleHint":
     "Starte {game} neu, damit die Sperren wirken. Ohne Neustart behält die laufende Sitzung das Relay, über das sie reingekommen ist.",
   "sidebar.elevationHint":
-    "Pings laufen auch ohne Adminrechte. Zum Blockieren braucht Windows erhöhte Rechte für die Firewall.",
+    "Adminrechte werden benötigt, um die Einstellungen anzuwenden.",
   "sidebar.alsoBlocked": "Auch gesperrt: {games}",
   "sidebar.clearAll": "Regeln aller Spiele entfernen",
 

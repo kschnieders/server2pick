@@ -80,7 +80,7 @@ export const en: Dictionary = {
   "sidebar.staleHint":
     "Restart {game} for the blocks to bite. Until then the running session keeps the relay it came in through.",
   "sidebar.elevationHint":
-    "Pings work without admin rights. Blocking needs elevated rights for the Windows firewall.",
+    "Administrator rights are required to apply the settings.",
   "sidebar.alsoBlocked": "Also blocked: {games}",
   "sidebar.clearAll": "Remove rules for all games",
 

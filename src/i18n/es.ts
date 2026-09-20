@@ -80,7 +80,7 @@ export const es: Dictionary = {
   "sidebar.staleHint":
     "Reinicia {game} para que los bloqueos surtan efecto. Hasta entonces, la sesión en curso mantiene el relé por el que entró.",
   "sidebar.elevationHint":
-    "El ping funciona sin permisos de administrador. Bloquear requiere permisos elevados para el firewall de Windows.",
+    "Se necesitan permisos de administrador para aplicar los ajustes.",
   "sidebar.alsoBlocked": "También bloqueado: {games}",
   "sidebar.clearAll": "Eliminar las reglas de todos los juegos",
 
