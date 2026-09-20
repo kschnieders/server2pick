@@ -171,7 +171,11 @@ export default function App() {
     }
     if (pops.length > 0 && allowedCount < MIN_SAFE_ALLOWED) {
       list.push({
-        text: t("warn.tooFew", { count: allowedCount, min: MIN_SAFE_ALLOWED }),
+        text: t("warn.tooFew", {
+          count: allowedCount,
+          total: pops.length,
+          min: MIN_SAFE_ALLOWED,
+        }),
       });
     }
     return list;

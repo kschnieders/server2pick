@@ -36,7 +36,7 @@ export const en: Dictionary = {
   "loading.pinging": "Measuring ping for {game} …",
 
   "warn.tooFew":
-    "Only {count} locations left open. Valve's relay network starts routing around them — matches will fail to confirm more often. Keep at least {min} open.",
+    "Only {count} of {total} locations left open. Valve's relay network starts routing around them and matches fail to confirm more often. We recommend keeping at least {min} active.",
   "warn.loadFailed": "Could not load the relay list: {error}",
   "warn.staleBinding":
     "The firewall rules for {game} point at a different program path than the current one — they block nothing. This happens after the game is moved or reinstalled. “Apply changes” rewrites them.",

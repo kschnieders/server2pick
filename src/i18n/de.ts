@@ -40,8 +40,11 @@ export const de = {
   "loading.game": "Lade Standorte für {game} …",
   "loading.pinging": "Messe Ping für {game} …",
 
+  // "{count} von {total}" statt "{count} Standorte": so stimmt der Satz auch
+  // bei genau einem freien Standort, ohne dass die Sprachdateien Pluralformen
+  // brauchen.
   "warn.tooFew":
-    "Nur noch {count} Standorte frei. Valves Relay-Netz sucht sich dann Umwege — Matches brechen häufiger ab. Lass mindestens {min} offen.",
+    "Nur noch {count} von {total} Standorten frei. Valves Relay-Netz sucht sich dann Umwege und Matches brechen häufiger ab. Wir empfehlen, mindestens {min} aktiv zu lassen.",
   "warn.loadFailed": "Relay-Liste nicht ladbar: {error}",
   "warn.staleBinding":
     "Die Firewall-Regeln für {game} zeigen auf einen anderen Programmpfad als den aktuellen — sie blockieren nichts. Das passiert, wenn das Spiel verschoben oder neu installiert wurde. Mit „Änderungen anwenden“ werden sie neu geschrieben.",

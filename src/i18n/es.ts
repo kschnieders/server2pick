@@ -36,7 +36,7 @@ export const es: Dictionary = {
   "loading.pinging": "Midiendo el ping de {game} …",
 
   "warn.tooFew":
-    "Solo quedan {count} ubicaciones abiertas. La red de relés de Valve empieza a buscar rodeos y las partidas fallan más a menudo. Deja abiertas al menos {min}.",
+    "Solo quedan {count} de {total} ubicaciones abiertas. La red de relés de Valve empieza a buscar rodeos y las partidas fallan más a menudo. Recomendamos mantener al menos {min} activas.",
   "warn.loadFailed": "No se pudo cargar la lista de relés: {error}",
   "warn.staleBinding":
     "Las reglas del firewall de {game} apuntan a una ruta de programa distinta de la actual: no bloquean nada. Ocurre cuando el juego se mueve o se reinstala. «Aplicar cambios» las reescribe.",
