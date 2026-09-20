@@ -34,6 +34,65 @@ fn resolve_program(settings: &store::Settings, game_id: &str) -> Option<String> 
         .or_else(|| games::find(game_id).and_then(games::find_executable))
 }
 
+/// Where a game's existing rules actually point, held against where they should.
+///
+/// The firewall binds a rule to an executable by path. Move the game to another
+/// Steam library and the rules survive untouched, still naming the old path —
+/// the rule count stays right, the UI keeps reporting the blocks as live, and
+/// nothing is blocked at all. That is the one failure this app cannot afford to
+/// report as success, so it gets looked up rather than assumed.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct RuleBinding {
+    /// Distinct executables the rules name, in the firewall's own spelling.
+    programs: Vec<String>,
+    /// How many rules apply machine-wide instead of to one program.
+    unbound: usize,
+    /// The path the rules ought to carry; `None` when the rules are meant to be
+    /// machine-wide or the executable cannot be located.
+    expected: Option<String>,
+    /// At least one rule names something other than `expected`.
+    stale: bool,
+}
+
+#[tauri::command]
+async fn rule_binding(app: tauri::AppHandle, game: String) -> Result<RuleBinding, String> {
+    let settings = store::load(&app);
+    let expected = resolve_program(&settings, &game);
+
+    let found = tokio::task::spawn_blocking(move || firewall::rule_programs(&game))
+        .await
+        .map_err(|e| format!("E_SPAWN|{e}"))??;
+
+    let unbound = found.iter().filter(|p| p.is_none()).count();
+    let mut programs: Vec<String> = found.into_iter().flatten().collect();
+    programs.sort();
+    programs.dedup();
+
+    // Windows compares paths case-insensitively and accepts either separator,
+    // so both are levelled before comparing. A false alarm here would be more
+    // than cosmetic: it keeps "Apply" lit and the warning up for good, even
+    // right after the rules were rewritten correctly.
+    let normalize = |p: &str| p.trim().replace('/', "\\").to_ascii_lowercase();
+
+    let stale = match &expected {
+        Some(want) => {
+            let want = normalize(want);
+            programs.iter().any(|have| normalize(have) != want)
+        }
+        // Machine-wide is the intent; a rule bound to a program is over-narrow
+        // rather than silently dead, and `scopeWarning` already covers that.
+        None => false,
+    };
+
+    Ok(RuleBinding {
+        programs,
+        unbound,
+        expected,
+        stale,
+    })
+}
+
 #[tauri::command]
 async fn fetch_pops(appid: u32) -> Result<sdr::SdrConfig, String> {
     sdr::fetch(appid).await
@@ -166,6 +225,7 @@ pub fn run() {
             fetch_pops,
             ping_round,
             system_state,
+            rule_binding,
             apply_blocks,
             clear_blocks,
             load_settings,

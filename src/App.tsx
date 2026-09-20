@@ -5,6 +5,7 @@ import {
   EMPTY_GAME_SETTINGS,
   type GameSettings,
   type Pop,
+  type RuleBinding,
   type Settings,
   type SystemState,
 } from "./api";
@@ -95,11 +96,48 @@ export default function App() {
     [sys, gameId],
   );
 
+  /**
+   * Timestamp of this game's last rule write. It is what tells the binding
+   * check that a rewrite happened: rewriting the same locations against a new
+   * path leaves the blocked set — and its size — untouched, so without this the
+   * check never re-runs and the warning it raised can never be cleared.
+   */
+  const appliedAt = gameId ? (sys?.appliedAt?.[gameId] ?? null) : null;
+
+  // Reading the firewall's application filter costs seconds, so it happens only
+  // when something could have changed the answer: another game, another
+  // executable, a change of scope, or a fresh write.
+  const [binding, setBinding] = useState<RuleBinding | null>(null);
+  useEffect(() => {
+    if (!gameId || appliedBlocked.size === 0) {
+      setBinding(null);
+      return;
+    }
+    let cancelled = false;
+    api
+      .ruleBinding(gameId)
+      .then((found) => {
+        if (!cancelled) setBinding(found);
+      })
+      .catch(() => {
+        // Unreadable is not the same as wrong — stay quiet rather than cry wolf.
+        if (!cancelled) setBinding(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [gameId, game?.path, settings.scopeToGame, appliedBlocked.size, appliedAt]);
+
   const dirty = useMemo(() => {
+    // Rules pointing at the wrong executable differ from the desired state just
+    // as much as a changed selection does — and flagging it here is what makes
+    // "Apply" clickable, so rewriting them against the new path is possible at
+    // all. Without this the app would report the problem and offer no way out.
+    if (binding?.stale) return true;
     if (blocked.size !== appliedBlocked.size) return true;
     for (const id of blocked) if (!appliedBlocked.has(id)) return true;
     return false;
-  }, [blocked, appliedBlocked]);
+  }, [blocked, appliedBlocked, binding]);
 
   const allowedCount = pops.length - blocked.size;
 
@@ -120,6 +158,14 @@ export default function App() {
         bad: true,
       });
     }
+    // Worse than a stale session: those rules block nothing at all, while the
+    // rule count and the status lines keep insisting they do.
+    if (binding?.stale) {
+      list.push({
+        text: t("warn.staleBinding", { game: game?.name ?? "" }),
+        bad: true,
+      });
+    }
     if (effect === "stale") {
       list.push({ text: t("warn.staleRules", { game: game?.name ?? "" }) });
     }
@@ -129,7 +175,7 @@ export default function App() {
       });
     }
     return list;
-  }, [loadError, effect, game, pops.length, allowedCount, t]);
+  }, [loadError, effect, binding, game, pops.length, allowedCount, t]);
 
   const refreshSystem = useCallback(async () => {
     try {

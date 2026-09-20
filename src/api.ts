@@ -42,6 +42,22 @@ export type ActiveRule = {
   pop: string;
 };
 
+/**
+ * Where a game's rules actually point. The firewall binds each rule to an
+ * executable path, and moving the game leaves those rules behind naming the old
+ * one — still counted, still reported as live, blocking nothing.
+ */
+export type RuleBinding = {
+  /** Distinct executables the rules name. */
+  programs: string[];
+  /** Rules that apply machine-wide instead of to one program. */
+  unbound: number;
+  /** The path the rules ought to carry. */
+  expected: string | null;
+  /** At least one rule names something else. */
+  stale: boolean;
+};
+
 export type SystemState = {
   elevated: boolean;
   games: GameInfo[];
@@ -95,6 +111,11 @@ export const pingRound = (targets: { pop: string; ips: string[] }[]) =>
   invoke<PingResult[]>("ping_round", { targets });
 
 export const systemState = () => invoke<SystemState>("system_state");
+
+/** Slow — reads the firewall's application filter. Call it on demand, not in a
+ *  poll: see the note on the Rust side. */
+export const ruleBinding = (game: string) =>
+  invoke<RuleBinding>("rule_binding", { game });
 
 export const applyBlocks = (game: string, rules: { pop: string; ips: string[] }[]) =>
   invoke<string[]>("apply_blocks", { game, rules });

@@ -43,6 +43,8 @@ export const de = {
   "warn.tooFew":
     "Nur noch {count} Standorte frei. Valves Relay-Netz sucht sich dann Umwege — Matches brechen häufiger ab. Lass mindestens {min} offen.",
   "warn.loadFailed": "Relay-Liste nicht ladbar: {error}",
+  "warn.staleBinding":
+    "Die Firewall-Regeln für {game} zeigen auf einen anderen Programmpfad als den aktuellen — sie blockieren nichts. Das passiert, wenn das Spiel verschoben oder neu installiert wurde. Mit „Änderungen anwenden“ werden sie neu geschrieben.",
   "warn.staleRules":
     "{game} lief schon, als die Regeln geschrieben wurden. Windows lässt bestehende Verbindungen weiterlaufen — das Spiel bleibt auf seinem alten Relay, bis du es neu startest.",
 

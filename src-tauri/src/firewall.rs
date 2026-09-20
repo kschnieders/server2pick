@@ -199,6 +199,36 @@ Get-NetFirewallRule -Group {group} | ForEach-Object {{ $_.DisplayName }}
         .collect())
 }
 
+/// The executable each of a game's rules is bound to, as the firewall holds it.
+/// An entry is `None` for a rule that applies machine-wide.
+///
+/// Deliberately kept out of `active_rules`: reading the application filter costs
+/// seconds for a full rule set — measured at roughly 3.6 s for forty rules —
+/// which is far too much for something the status poll repeats every twenty
+/// seconds. A binding only goes stale when the game moves, so the check belongs
+/// where that can actually be noticed rather than on every tick.
+pub fn rule_programs(game: &str) -> Result<Vec<Option<String>>, String> {
+    // A path can never be a bare dash, so it is safe as the "no program" marker.
+    let script = format!(
+        r#"$ErrorActionPreference = 'SilentlyContinue'
+Get-NetFirewallRule -Group {group} | Where-Object {{ $_.DisplayName -like {pattern} }} | ForEach-Object {{
+  $p = ($_ | Get-NetFirewallApplicationFilter).Program
+  if ($p) {{ Write-Output $p }} else {{ Write-Output '-' }}
+}}
+"#,
+        group = ps_quote(GROUP),
+        pattern = ps_quote(&format!("{NAME_PREFIX}{game}/*")),
+    );
+
+    let out = run_powershell(&script)?;
+    Ok(out
+        .lines()
+        .map(str::trim)
+        .filter(|l| !l.is_empty())
+        .map(|l| if l == "-" { None } else { Some(l.to_string()) })
+        .collect())
+}
+
 /// Replaces one game's rule set in a single PowerShell session: wipe that
 /// game's rules, then write exactly the ones that should exist. Applying a
 /// desired state instead of a diff means a crash mid-way can never leave a

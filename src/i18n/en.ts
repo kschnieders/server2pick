@@ -38,6 +38,8 @@ export const en: Dictionary = {
   "warn.tooFew":
     "Only {count} locations left open. Valve's relay network starts routing around them — matches will fail to confirm more often. Keep at least {min} open.",
   "warn.loadFailed": "Could not load the relay list: {error}",
+  "warn.staleBinding":
+    "The firewall rules for {game} point at a different program path than the current one — they block nothing. This happens after the game is moved or reinstalled. “Apply changes” rewrites them.",
   "warn.staleRules":
     "{game} was already running when the rules were written. Windows leaves existing connections alone — the game keeps the relay it started on until you restart it.",
 

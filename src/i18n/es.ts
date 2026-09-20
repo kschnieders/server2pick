@@ -38,6 +38,8 @@ export const es: Dictionary = {
   "warn.tooFew":
     "Solo quedan {count} ubicaciones abiertas. La red de relés de Valve empieza a buscar rodeos y las partidas fallan más a menudo. Deja abiertas al menos {min}.",
   "warn.loadFailed": "No se pudo cargar la lista de relés: {error}",
+  "warn.staleBinding":
+    "Las reglas del firewall de {game} apuntan a una ruta de programa distinta de la actual: no bloquean nada. Ocurre cuando el juego se mueve o se reinstala. «Aplicar cambios» las reescribe.",
   "warn.staleRules":
     "{game} ya estaba en ejecución cuando se escribieron las reglas. Windows no toca las conexiones existentes: el juego mantiene el relé por el que entró hasta que lo reinicies.",
 
