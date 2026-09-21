@@ -23,7 +23,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # Beides bricht den Build sonst erst ganz am Ende ab — das Secret nach
       # dem kompletten Rust-Build, der Platzhalter-Key sogar überhaupt nicht:
@@ -79,7 +79,7 @@ jobs:
             console.log('Version gesetzt:', version);
           "
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
