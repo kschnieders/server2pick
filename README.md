@@ -1,12 +1,21 @@
 # server2pick
 
-Choose which Valve data centres your matches are allowed to use — per game,
+Choose which Valve data centres your matches are allowed to use. Per game,
 with live ping.
+
+### [⬇ Download the installer](../../releases/latest)
+
+[![Downloads](https://img.shields.io/github/downloads/kschnieders/server2pick/total?label=downloads&color=3ec7a8)](../../releases)
+[![Latest release](https://img.shields.io/github/v/release/kschnieders/server2pick?label=latest&color=e8a33d)](../../releases/latest)
+
+**You need:** Windows 10 or 11 · one of the supported games · administrator
+rights the first time you block something. Nothing else. No account, no
+driver, no background service.
 
 ![server2pick](docs/screenshot.png)
 
 Supports **Deadlock**, **Counter-Strike 2**, **Dota 2** and **Team Fortress 2**.
-Windows only. Interface in English and German.
+Interface in English, German, Spanish and Russian.
 
 ## What it does
 
