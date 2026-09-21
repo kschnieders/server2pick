@@ -167,6 +167,23 @@ export const en: Dictionary = {
   "error.E_SELF_PATH": "Could not determine this program's own path.",
   "error.unknown": "Unexpected error.",
 
+  "active.title": "Blocks active",
+  "active.ofTotal": "of {total} locations blocked for {game}",
+  "active.otherGames": "Also blocked: {games}",
+  "active.persistHint":
+    "These rules apply while server2pick is closed too. They stay until you lift them here.",
+  "active.unblock": "Lift the blocks",
+  "active.keep": "Keep editing",
+
+  "close.title": "Rules stay active",
+  "close.body":
+    "{count} firewall rules are in place. They keep working after the app is closed.",
+  "close.keep": "Keep them and quit",
+  "close.remove": "Remove them and quit",
+  "close.needsAdmin":
+    "Removing them needs administrator rights. Restart as admin, or leave the rules in place.",
+  "close.cancel": "Cancel",
+
   "update.title": "Update",
   "update.available": "Version {version} is available.",
   "update.install": "Install now",

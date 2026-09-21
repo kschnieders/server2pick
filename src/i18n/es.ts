@@ -168,6 +168,23 @@ export const es: Dictionary = {
   "error.E_SELF_PATH": "No se pudo determinar la ruta del propio programa.",
   "error.unknown": "Error inesperado.",
 
+  "active.title": "Bloqueos activos",
+  "active.ofTotal": "de {total} ubicaciones bloqueadas para {game}",
+  "active.otherGames": "También bloqueado: {games}",
+  "active.persistHint":
+    "Estas reglas también se aplican con server2pick cerrado. Siguen vigentes hasta que las quites aquí.",
+  "active.unblock": "Quitar los bloqueos",
+  "active.keep": "Seguir editando",
+
+  "close.title": "Las reglas siguen activas",
+  "close.body":
+    "Hay {count} reglas de firewall puestas. Siguen funcionando después de cerrar la aplicación.",
+  "close.keep": "Mantenerlas y salir",
+  "close.remove": "Quitarlas y salir",
+  "close.needsAdmin":
+    "Quitarlas requiere permisos de administrador. Reinicia como administrador o deja las reglas puestas.",
+  "close.cancel": "Cancelar",
+
   "update.title": "Actualización",
   "update.available": "La versión {version} está disponible.",
   "update.install": "Instalar ahora",

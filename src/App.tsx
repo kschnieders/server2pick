@@ -9,6 +9,9 @@ import {
   type Settings,
   type SystemState,
 } from "./api";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { ActiveRulesOverlay } from "./components/ActiveRulesOverlay";
+import { CloseDialog } from "./components/CloseDialog";
 import { GamePicker } from "./components/GamePicker";
 import { LoadingBar } from "./components/LoadingBar";
 import { ServerList } from "./components/ServerList";
@@ -66,6 +69,11 @@ export default function App() {
    *  slim bar instead of the full splash. */
   const [initialDone, setInitialDone] = useState(false);
 
+  /** Shown when live rules could catch someone off guard; see the component. */
+  const [rulesOverlayOpen, setRulesOverlayOpen] = useState(false);
+  /** Set while the window close is held back waiting for an answer. */
+  const [closeAsked, setCloseAsked] = useState(false);
+
   const { state: updateState, install: installUpdate } = useUpdater();
 
   const language = settings.language ?? detectLanguage();
@@ -95,6 +103,17 @@ export default function App() {
       ),
     [sys, gameId],
   );
+
+  /** Every game holding rules right now, as "name (count)". */
+  const gamesWithRules = useMemo(
+    () =>
+      (sys?.games ?? [])
+        .filter((g) => (ruleCounts[g.id] ?? 0) > 0)
+        .map((g) => `${g.name} (${ruleCounts[g.id]})`),
+    [sys, ruleCounts],
+  );
+
+  const totalRules = useMemo(() => (sys?.rules ?? []).length, [sys]);
 
   /**
    * Timestamp of this game's last rule write. It is what tells the binding
@@ -463,6 +482,68 @@ export default function App() {
     }
   };
 
+  /**
+   * The overlay opens at the two moments live rules can catch someone out: the
+   * app opening, and switching to a game that already holds rules. Deliberately
+   * not after applying — the notice confirms that already, and re-opening would
+   * nag through every round of tweaking.
+   */
+  const overlayShownFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!initialDone || !gameId) return;
+    if (overlayShownFor.current === gameId) return;
+    if (appliedBlocked.size === 0) return;
+    overlayShownFor.current = gameId;
+    setRulesOverlayOpen(true);
+  }, [initialDone, gameId, appliedBlocked.size]);
+
+  // The rules live in the Windows firewall, not in this process, so closing the
+  // window leaves them blocking. Holding the close back is the only moment that
+  // fact can still be acted on.
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+    let cancelled = false;
+
+    getCurrentWindow()
+      .onCloseRequested((event) => {
+        if (totalRules === 0) return;
+        event.preventDefault();
+        setCloseAsked(true);
+      })
+      .then((fn) => {
+        if (cancelled) fn();
+        else unlisten = fn;
+      })
+      .catch(() => {
+        // Without the hook the window simply closes as it always did.
+      });
+
+    return () => {
+      cancelled = true;
+      unlisten?.();
+    };
+  }, [totalRules]);
+
+  const closeKeepingRules = () => {
+    setCloseAsked(false);
+    getCurrentWindow().destroy();
+  };
+
+  const closeRemovingRules = async () => {
+    setBusy(true);
+    try {
+      await api.clearBlocks(undefined);
+      await getCurrentWindow().destroy();
+    } catch (e) {
+      // Clearing needs elevation; a refusal must not close the window, or the
+      // rules would survive under the impression that they were removed.
+      setNotice({ text: translateError(t, e), tone: "bad" });
+      setCloseAsked(false);
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const elevate = async () => {
     try {
       await api.elevate();
@@ -681,6 +762,33 @@ export default function App() {
             code={shareCode}
             onImport={importShare}
             onClose={() => setShareOpen(false)}
+          />
+        )}
+
+        {rulesOverlayOpen && !showPicker && game && (
+          <ActiveRulesOverlay
+            gameName={game.name}
+            pops={pops}
+            blockedIds={appliedBlocked}
+            otherGames={gamesWithRules.filter((g) => !g.startsWith(game.name))}
+            busy={busy}
+            onUnblock={async () => {
+              await clear("game");
+              setRulesOverlayOpen(false);
+            }}
+            onDismiss={() => setRulesOverlayOpen(false)}
+          />
+        )}
+
+        {closeAsked && (
+          <CloseDialog
+            count={totalRules}
+            games={gamesWithRules}
+            elevated={sys?.elevated ?? false}
+            busy={busy}
+            onKeep={closeKeepingRules}
+            onRemove={closeRemovingRules}
+            onCancel={() => setCloseAsked(false)}
           />
         )}
 

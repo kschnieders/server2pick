@@ -17,17 +17,19 @@ type Props = {
   onToggle: (id: string) => void;
 };
 
-/** Equirectangular projection matching the pre-projected land path. */
-const projectX = (lon: number) => lon + 180;
-const projectY = (lat: number) => 90 - lat;
+/** Equirectangular projection matching the pre-projected land path.
+ *  Exported because the overlay draws the same world at a smaller size; two
+ *  copies of these would drift apart the first time the framing changes. */
+export const projectX = (lon: number) => lon + 180;
+export const projectY = (lat: number) => 90 - lat;
 
 /** Crops the poles, where Valve has no relays and the projection only wastes
  *  height. Stockholm (lat 59) and Buenos Aires (lat -35) are the outer POPs —
  *  the window keeps a wide margin beyond them so no dot sits on an edge.
  *  Widening it only makes the element taller: the viewBox is still 360 wide,
  *  so the horizontal scale, and with it the on-screen dot size, is unchanged. */
-const VIEW_TOP = 13;
-const VIEW_HEIGHT = 126;
+export const VIEW_TOP = 13;
+export const VIEW_HEIGHT = 126;
 
 export function WorldMap({ pops, blocked, history, onToggle }: Props) {
   const t = useT();

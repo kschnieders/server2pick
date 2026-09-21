@@ -175,6 +175,23 @@ export const de = {
   "error.E_SELF_PATH": "Eigener Programmpfad nicht ermittelbar.",
   "error.unknown": "Unerwarteter Fehler.",
 
+  "active.title": "Sperren aktiv",
+  "active.ofTotal": "von {total} Standorten für {game} gesperrt",
+  "active.otherGames": "Außerdem gesperrt: {games}",
+  "active.persistHint":
+    "Diese Regeln gelten auch, wenn server2pick geschlossen ist. Sie bleiben bestehen, bis du sie hier aufhebst.",
+  "active.unblock": "Sperren aufheben",
+  "active.keep": "Weiter bearbeiten",
+
+  "close.title": "Regeln bleiben aktiv",
+  "close.body":
+    "{count} Firewall-Regeln sind gerade gesetzt. Sie wirken weiter, auch wenn das Programm geschlossen ist.",
+  "close.keep": "Aktiv lassen und beenden",
+  "close.remove": "Regeln entfernen und beenden",
+  "close.needsAdmin":
+    "Zum Entfernen werden Adminrechte benötigt. Starte das Programm als Admin neu, oder lass die Regeln aktiv.",
+  "close.cancel": "Abbrechen",
+
   "update.title": "Update",
   "update.available": "Version {version} ist verfügbar.",
   "update.install": "Jetzt installieren",
