@@ -49,6 +49,16 @@ pub struct Settings {
     /// relays machine-wide. Off means one blocklist hits every SDR game.
     pub scope_to_game: bool,
     pub ping_interval_ms: u64,
+    /// What to do with live rules when the window closes: `ask`, `keep` or
+    /// `remove`. Kept as a string so an unknown value from a newer version
+    /// cannot make the whole settings file unreadable.
+    pub close_action: String,
+    /// Show the blocks-are-live overlay when the app opens.
+    pub show_active_overlay: bool,
+    /// Ask GitHub for a newer release on start.
+    pub check_updates: bool,
+    /// Show the world map above the server list.
+    pub show_map: bool,
     pub games: HashMap<String, GameSettings>,
 }
 
@@ -59,6 +69,10 @@ impl Default for Settings {
             last_game: None,
             scope_to_game: true,
             ping_interval_ms: 4000,
+            close_action: "ask".into(),
+            show_active_overlay: true,
+            check_updates: true,
+            show_map: true,
             games: HashMap::new(),
         }
     }

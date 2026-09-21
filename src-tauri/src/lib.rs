@@ -218,7 +218,14 @@ pub fn run() {
     // The updater restarts the app through the process plugin, so the two
     // always travel together.
     #[cfg(desktop)]
-    let builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+    let builder = builder
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        // Registry autostart. No launch arguments: starting with Windows means
+        // the window opens as usual, not something hidden in the background.
+        .plugin(tauri_plugin_autostart::init(
+            tauri_plugin_autostart::MacosLauncher::LaunchAgent,
+            None,
+        ));
 
     builder
         .invoke_handler(tauri::generate_handler![

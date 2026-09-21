@@ -19,11 +19,15 @@ export type UpdateState =
   | { status: "ready"; version: string }
   | { status: "failed"; version: string };
 
-export function useUpdater() {
+export function useUpdater(enabled: boolean) {
   const [state, setState] = useState<UpdateState>({ status: "idle" });
   const [update, setUpdate] = useState<Update | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      setState({ status: "idle" });
+      return;
+    }
     let cancelled = false;
 
     (async () => {
@@ -40,7 +44,7 @@ export function useUpdater() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [enabled]);
 
   const install = useCallback(async () => {
     if (!update) return;

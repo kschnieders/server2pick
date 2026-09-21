@@ -25,9 +25,6 @@ export const es: Dictionary = {
   "header.revision": "rev. {revision}",
   "header.loadingRelays": "cargando lista de relés …",
   "header.bestActive": "Mejor permitida",
-  "header.map": "Mapa",
-  "header.mapShow": "Mostrar el mapa",
-  "header.mapHide": "Ocultar el mapa",
   "header.unblock": "Desbloquear",
   "header.apply": "Aplicar cambios",
   "header.applied": "Aplicado",
@@ -167,6 +164,29 @@ export const es: Dictionary = {
   "error.E_SETTINGS_SAVE": "No se pudo guardar la configuración.",
   "error.E_SELF_PATH": "No se pudo determinar la ruta del propio programa.",
   "error.unknown": "Error inesperado.",
+
+  "prefs.title": "Ajustes",
+  "prefs.tab.general": "General",
+  "prefs.tab.appearance": "Apariencia",
+  "prefs.tab.behaviour": "Comportamiento",
+  "prefs.autostart": "Iniciar con Windows",
+  "prefs.autostartHint":
+    "Abre server2pick al iniciar sesión. No aplica ninguna regla por sí solo.",
+  "prefs.closeAction": "Al cerrar",
+  "prefs.closeActionHint":
+    "Qué ocurre con las reglas activas del firewall cuando cierras la ventana.",
+  "prefs.close.ask": "Preguntar",
+  "prefs.close.keep": "Mantenerlas",
+  "prefs.close.remove": "Quitarlas",
+  "prefs.map": "Mostrar el mapa",
+  "prefs.mapHint":
+    "El mapa sobre la lista de servidores. Desactivado deja sitio para más ubicaciones.",
+  "prefs.overlay": "Aviso al iniciar",
+  "prefs.overlayHint":
+    "Muestra al abrir qué ubicaciones están bloqueadas en ese momento.",
+  "prefs.updates": "Buscar actualizaciones",
+  "prefs.updatesHint": "Consulta a GitHub si hay una versión más reciente.",
+  "prefs.pingHint": "Intervalos cortos reaccionan antes y usan más red.",
 
   "active.title": "Bloqueos activos",
   "active.ofTotal": "de {total} ubicaciones bloqueadas para {game}",

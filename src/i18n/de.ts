@@ -30,9 +30,6 @@ export const de = {
   "header.revision": "Rev. {revision}",
   "header.loadingRelays": "lade Relay-Liste …",
   "header.bestActive": "Bester aktiver",
-  "header.map": "Karte",
-  "header.mapShow": "Karte einblenden",
-  "header.mapHide": "Karte ausblenden",
   "header.unblock": "Entsperren",
   "header.apply": "Änderungen anwenden",
   "header.applied": "Angewendet",
@@ -174,6 +171,29 @@ export const de = {
   "error.E_SETTINGS_SAVE": "Einstellungen konnten nicht gespeichert werden.",
   "error.E_SELF_PATH": "Eigener Programmpfad nicht ermittelbar.",
   "error.unknown": "Unerwarteter Fehler.",
+
+  "prefs.title": "Einstellungen",
+  "prefs.tab.general": "Allgemein",
+  "prefs.tab.appearance": "Darstellung",
+  "prefs.tab.behaviour": "Verhalten",
+  "prefs.autostart": "Mit Windows starten",
+  "prefs.autostartHint":
+    "Öffnet server2pick beim Anmelden. Regeln werden dadurch nicht automatisch gesetzt.",
+  "prefs.closeAction": "Beim Schließen",
+  "prefs.closeActionHint":
+    "Was mit aktiven Firewall-Regeln passiert, wenn du das Fenster schließt.",
+  "prefs.close.ask": "Nachfragen",
+  "prefs.close.keep": "Aktiv lassen",
+  "prefs.close.remove": "Entfernen",
+  "prefs.map": "Weltkarte anzeigen",
+  "prefs.mapHint":
+    "Die Karte über der Serverliste. Aus spart Platz für mehr Standorte.",
+  "prefs.overlay": "Hinweis beim Start",
+  "prefs.overlayHint":
+    "Zeigt beim Öffnen die Übersicht, welche Standorte gerade gesperrt sind.",
+  "prefs.updates": "Nach Updates suchen",
+  "prefs.updatesHint": "Fragt beim Start bei GitHub nach einer neueren Version.",
+  "prefs.pingHint": "Kürzere Abstände reagieren schneller, kosten mehr Netzlast.",
 
   "active.title": "Sperren aktiv",
   "active.ofTotal": "von {total} Standorten für {game} gesperrt",

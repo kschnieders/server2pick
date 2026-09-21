@@ -16,6 +16,7 @@ import { GamePicker } from "./components/GamePicker";
 import { LoadingBar } from "./components/LoadingBar";
 import { ServerList } from "./components/ServerList";
 import { Sidebar } from "./components/Sidebar";
+import { SettingsDialog } from "./components/SettingsDialog";
 import { ShareDialog } from "./components/ShareDialog";
 import { UpdateCard } from "./components/UpdateCard";
 import { Splash } from "./components/Splash";
@@ -34,6 +35,35 @@ import { useUpdater } from "./lib/updater";
 /** Steam Datagram Relay reroutes around blocked POPs. Leaving too few open is
  *  what turns "pick my region" into endless match-confirmation timeouts. */
 const MIN_SAFE_ALLOWED = 3;
+
+/** A header action that carries no label — the name lives in the tooltip. */
+function IconButton({
+  onClick,
+  label,
+  active,
+  children,
+}: {
+  onClick: () => void;
+  label: string;
+  active?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      aria-pressed={active}
+      className={`rounded-lg p-1.5 transition-colors ${
+        active ? "text-ink-300 hover:text-ink-100" : "text-ink-600 hover:text-ink-100"
+      }`}
+    >
+      <svg viewBox="0 0 24 24" className="h-[18px] w-[18px]" aria-hidden="true">
+        {children}
+      </svg>
+    </button>
+  );
+}
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -63,7 +93,6 @@ export default function App() {
     tone?: "ok" | "warn" | "bad";
   } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [mapVisible, setMapVisible] = useState(true);
   const [splashTimedOut, setSplashTimedOut] = useState(false);
   /** Flips once the first load is through; from then on a game switch gets the
    *  slim bar instead of the full splash. */
@@ -71,10 +100,11 @@ export default function App() {
 
   /** Shown when live rules could catch someone off guard; see the component. */
   const [rulesOverlayOpen, setRulesOverlayOpen] = useState(false);
+  const [prefsOpen, setPrefsOpen] = useState(false);
   /** Set while the window close is held back waiting for an answer. */
   const [closeAsked, setCloseAsked] = useState(false);
 
-  const { state: updateState, install: installUpdate } = useUpdater();
+  const { state: updateState, install: installUpdate } = useUpdater(settings.checkUpdates);
 
   const language = settings.language ?? detectLanguage();
   const t = useMemo(() => makeTranslate(language), [language]);
@@ -494,6 +524,7 @@ export default function App() {
     if (overlayShownFor.current === gameId) return;
     if (appliedBlocked.size === 0) return;
     overlayShownFor.current = gameId;
+    if (!settings.showActiveOverlay) return;
     setRulesOverlayOpen(true);
   }, [initialDone, gameId, appliedBlocked.size]);
 
@@ -507,7 +538,14 @@ export default function App() {
     getCurrentWindow()
       .onCloseRequested((event) => {
         if (totalRules === 0) return;
+        // A standing answer skips the question; "keep" is simply letting the
+        // close through, which is what would happen without this hook at all.
+        if (settings.closeAction === "keep") return;
         event.preventDefault();
+        if (settings.closeAction === "remove") {
+          void closeRemovingRules();
+          return;
+        }
         setCloseAsked(true);
       })
       .then((fn) => {
@@ -522,7 +560,7 @@ export default function App() {
       cancelled = true;
       unlisten?.();
     };
-  }, [totalRules]);
+  }, [totalRules, settings.closeAction]);
 
   const closeKeepingRules = () => {
     setCloseAsked(false);
@@ -637,20 +675,37 @@ export default function App() {
             </div>
           )}
 
-          <button
-            onClick={() => setShareOpen(true)}
-            className="rounded-lg border border-ink-700 px-3 py-1.5 text-xs text-ink-300 transition-colors hover:border-amber-glow/60 hover:text-amber-glow"
-          >
-            {t("share.button")}
-          </button>
+          {/* Map, settings and share are quiet icons: they open or toggle a
+              view and never change the firewall, so they stay out of the way of
+              the two buttons that do. The active map state is carried by colour
+              rather than a second icon, so the row never shifts. */}
+          <IconButton onClick={() => setPrefsOpen(true)} label={t("prefs.title")}>
+            <path
+              fill="currentColor"
+              d="M12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Zm7.43-2.53c.04-.32.07-.64.07-.97s-.03-.65-.07-.97l2.11-1.63a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.3 7.3 0 0 0-1.69-.98l-.38-2.65A.49.49 0 0 0 14 2h-4a.49.49 0 0 0-.49.42l-.38 2.65c-.61.25-1.17.58-1.69.98l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.63c-.04.32-.07.65-.07.97s.03.65.07.97L2.46 14.6a.5.5 0 0 0-.12.64l2 3.46c.14.24.44.33.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.49.42h4c.24 0 .45-.18.49-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.17.11.47.02.61-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.63Z"
+            />
+          </IconButton>
 
-          <button
-            onClick={() => setMapVisible((v) => !v)}
-            title={mapVisible ? t("header.mapHide") : t("header.mapShow")}
-            className="rounded-lg border border-ink-700 px-3 py-1.5 text-xs text-ink-300 transition-colors hover:border-ink-600 hover:text-ink-100"
+          <IconButton
+            onClick={() => setShareOpen(true)}
+            label={t("share.button")}
           >
-            {t("header.map")}
-          </button>
+            {/* Drawn as three nodes rather than one filled path: at 18px the
+                circles of the usual glyph shrink until it reads as a bare "<". */}
+            <g
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={1.8}
+              strokeLinecap="round"
+            >
+              <path d="M8.4 10.9 15.6 6.6M8.4 13.1l7.2 4.3" />
+            </g>
+            <g fill="currentColor">
+              <circle cx="18" cy="5" r="2.7" />
+              <circle cx="6" cy="12" r="2.7" />
+              <circle cx="18" cy="19" r="2.7" />
+            </g>
+          </IconButton>
 
           <button
             onClick={() => clear("game")}
@@ -702,7 +757,7 @@ export default function App() {
         <main className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_300px] grid-rows-[minmax(0,1fr)] gap-4 overflow-hidden p-4">
           <div className="flex min-h-0 flex-col gap-4">
             {/* The map stays put; only the list underneath scrolls. */}
-            {mapVisible && (
+            {settings.showMap && (
               <div className="shrink-0 overflow-hidden rounded-xl border border-ink-800">
                 <WorldMap
                   pops={pops}
@@ -777,6 +832,16 @@ export default function App() {
               setRulesOverlayOpen(false);
             }}
             onDismiss={() => setRulesOverlayOpen(false)}
+          />
+        )}
+
+        {prefsOpen && (
+          <SettingsDialog
+            settings={settings}
+            language={language}
+            onSettings={patchSettings}
+            onLanguage={(code) => patchSettings({ language: code })}
+            onClose={() => setPrefsOpen(false)}
           />
         )}
 

@@ -25,9 +25,6 @@ export const ru: Dictionary = {
   "header.revision": "рев. {revision}",
   "header.loadingRelays": "загрузка списка реле …",
   "header.bestActive": "Лучшая разрешённая",
-  "header.map": "Карта",
-  "header.mapShow": "Показать карту",
-  "header.mapHide": "Скрыть карту",
   "header.unblock": "Разблокировать",
   "header.apply": "Применить изменения",
   "header.applied": "Применено",
@@ -167,6 +164,29 @@ export const ru: Dictionary = {
   "error.E_SETTINGS_SAVE": "Не удалось сохранить настройки.",
   "error.E_SELF_PATH": "Не удалось определить путь к самой программе.",
   "error.unknown": "Непредвиденная ошибка.",
+
+  "prefs.title": "Настройки",
+  "prefs.tab.general": "Общие",
+  "prefs.tab.appearance": "Внешний вид",
+  "prefs.tab.behaviour": "Поведение",
+  "prefs.autostart": "Запускать с Windows",
+  "prefs.autostartHint":
+    "Открывает server2pick при входе в систему. Правила сами по себе не применяются.",
+  "prefs.closeAction": "При закрытии",
+  "prefs.closeActionHint":
+    "Что происходит с активными правилами брандмауэра при закрытии окна.",
+  "prefs.close.ask": "Спрашивать",
+  "prefs.close.keep": "Оставлять",
+  "prefs.close.remove": "Удалять",
+  "prefs.map": "Показывать карту мира",
+  "prefs.mapHint":
+    "Карта над списком серверов. Без неё помещается больше локаций.",
+  "prefs.overlay": "Уведомление при запуске",
+  "prefs.overlayHint":
+    "При открытии показывает, какие локации сейчас заблокированы.",
+  "prefs.updates": "Проверять обновления",
+  "prefs.updatesHint": "При запуске спрашивает GitHub о новой версии.",
+  "prefs.pingHint": "Короткие интервалы реагируют быстрее и нагружают сеть.",
 
   "active.title": "Блокировки активны",
   "active.ofTotal": "из {total} локаций заблокировано для {game}",

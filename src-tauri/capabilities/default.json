@@ -11,6 +11,9 @@
     "clipboard-manager:allow-read-text",
     "updater:default",
     "process:allow-restart",
-    "core:window:allow-destroy"
+    "core:window:allow-destroy",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:allow-is-enabled"
   ]
 }

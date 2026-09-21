@@ -25,9 +25,6 @@ export const en: Dictionary = {
   "header.revision": "rev. {revision}",
   "header.loadingRelays": "loading relay list …",
   "header.bestActive": "Best allowed",
-  "header.map": "Map",
-  "header.mapShow": "Show map",
-  "header.mapHide": "Hide map",
   "header.unblock": "Unblock",
   "header.apply": "Apply changes",
   "header.applied": "Applied",
@@ -166,6 +163,29 @@ export const en: Dictionary = {
   "error.E_SETTINGS_SAVE": "Settings could not be saved.",
   "error.E_SELF_PATH": "Could not determine this program's own path.",
   "error.unknown": "Unexpected error.",
+
+  "prefs.title": "Settings",
+  "prefs.tab.general": "General",
+  "prefs.tab.appearance": "Appearance",
+  "prefs.tab.behaviour": "Behaviour",
+  "prefs.autostart": "Start with Windows",
+  "prefs.autostartHint":
+    "Opens server2pick when you sign in. It does not apply any rules by itself.",
+  "prefs.closeAction": "When closing",
+  "prefs.closeActionHint":
+    "What happens to live firewall rules when you close the window.",
+  "prefs.close.ask": "Ask",
+  "prefs.close.keep": "Keep them",
+  "prefs.close.remove": "Remove them",
+  "prefs.map": "Show the world map",
+  "prefs.mapHint":
+    "The map above the server list. Off leaves room for more locations.",
+  "prefs.overlay": "Notice on start",
+  "prefs.overlayHint":
+    "Shows which locations are blocked right now when the app opens.",
+  "prefs.updates": "Check for updates",
+  "prefs.updatesHint": "Asks GitHub for a newer release on start.",
+  "prefs.pingHint": "Shorter intervals react faster and use more network.",
 
   "active.title": "Blocks active",
   "active.ofTotal": "of {total} locations blocked for {game}",

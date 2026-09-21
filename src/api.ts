@@ -80,12 +80,23 @@ export type GameSettings = {
   appliedAt: number | null;
 };
 
+/** What happens to live rules when the window is closed. */
+export type CloseAction = "ask" | "keep" | "remove";
+
 export type Settings = {
   /** UI language code; `null` follows the system. */
   language: string | null;
   lastGame: string | null;
   scopeToGame: boolean;
   pingIntervalMs: number;
+  /** `ask` every time, or skip the question with a fixed answer. */
+  closeAction: CloseAction;
+  /** Show the blocks-are-live overlay when the app opens. */
+  showActiveOverlay: boolean;
+  /** Ask GitHub for a newer release on start. */
+  checkUpdates: boolean;
+  /** Show the world map above the server list. */
+  showMap: boolean;
   games: Record<string, GameSettings>;
 };
 
@@ -101,6 +112,10 @@ export const DEFAULT_SETTINGS: Settings = {
   lastGame: null,
   scopeToGame: true,
   pingIntervalMs: 4000,
+  closeAction: "ask",
+  showActiveOverlay: true,
+  checkUpdates: true,
+  showMap: true,
   games: {},
 };
 

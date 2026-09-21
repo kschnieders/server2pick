@@ -50,10 +50,14 @@ export function ActiveRulesOverlay({
   return (
     <div
       className="absolute inset-0 z-50 grid place-items-center bg-ink-950/75 backdrop-blur-md"
+      style={{ animation: "overlay-backdrop-in 380ms ease-out both" }}
       onClick={onDismiss}
     >
       <div
         className="w-[34rem] max-w-[92vw] overflow-hidden rounded-2xl border border-rose-glow/30 bg-ink-900 shadow-2xl shadow-black/70"
+        style={{
+          animation: "overlay-card-in 560ms cubic-bezier(0.16, 0.8, 0.24, 1) 120ms both",
+        }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="relative">
@@ -106,28 +110,39 @@ export function ActiveRulesOverlay({
 
               return (
                 <g key={pop.id}>
-                  {/* Staggered, so the blocked locations read as a wave rather
-                      than one synchronised blink. */}
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r={3}
-                    fill="none"
-                    stroke="#e5615e"
-                    strokeWidth={0.6}
+                  {/* Ring and dot share one entrance group: without it the
+                      pulse would start before its own location has landed. */}
+                  <g
                     style={{
                       transformOrigin: `${x}px ${y}px`,
-                      animation: "pulse-ring 2.8s ease-out infinite",
-                      animationDelay: `${(index % 9) * 0.3}s`,
+                      animation: `overlay-dot-in 340ms cubic-bezier(0.2, 1.3, 0.4, 1) ${
+                        420 + index * 45
+                      }ms both`,
                     }}
-                  />
-                  <circle cx={x} cy={y} r={2.2} fill="#e5615e" />
-                  <path
-                    d={`M ${x - 1} ${y - 1} L ${x + 1} ${y + 1} M ${x + 1} ${y - 1} L ${x - 1} ${y + 1}`}
-                    stroke="#0d0f12"
-                    strokeWidth={0.6}
-                    strokeLinecap="round"
-                  />
+                  >
+                    {/* Staggered, so the blocked locations read as a wave
+                        rather than one synchronised blink. */}
+                    <circle
+                      cx={x}
+                      cy={y}
+                      r={3}
+                      fill="none"
+                      stroke="#e5615e"
+                      strokeWidth={0.6}
+                      style={{
+                        transformOrigin: `${x}px ${y}px`,
+                        animation: "pulse-ring 2.8s ease-out infinite",
+                        animationDelay: `${800 + (index % 9) * 300}ms`,
+                      }}
+                    />
+                    <circle cx={x} cy={y} r={2.2} fill="#e5615e" />
+                    <path
+                      d={`M ${x - 1} ${y - 1} L ${x + 1} ${y + 1} M ${x + 1} ${y - 1} L ${x - 1} ${y + 1}`}
+                      stroke="#0d0f12"
+                      strokeWidth={0.6}
+                      strokeLinecap="round"
+                    />
+                  </g>
                 </g>
               );
             })}

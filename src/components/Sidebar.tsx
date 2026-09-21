@@ -213,6 +213,7 @@ export function Sidebar({
           sys && !sys.elevated ? (
             <button
               onClick={onElevate}
+              style={{ animation: "button-halo 2.8s ease-in-out infinite" }}
               className="shrink-0 rounded-md bg-amber-glow/15 px-2 py-0.5 text-[11px] font-medium text-amber-glow transition-colors hover:bg-amber-glow/25"
             >
               {t("sidebar.elevate")}
@@ -424,19 +425,8 @@ export function Sidebar({
           </p>
         )}
 
-        <label className="mt-2 flex items-center justify-between gap-2 text-xs">
-          <span className="text-ink-400">{t("settings.pingInterval")}</span>
-          <select
-            value={settings.pingIntervalMs}
-            onChange={(e) => onSettings({ pingIntervalMs: Number(e.target.value) })}
-            className="rounded-md border border-ink-700 bg-ink-950 px-1.5 py-1 text-xs text-ink-100 outline-none focus:border-amber-glow/60"
-          >
-            <option value={2000}>2 s</option>
-            <option value={4000}>4 s</option>
-            <option value={8000}>8 s</option>
-            <option value={15000}>15 s</option>
-          </select>
-        </label>
+        {/* The ping interval lives in the settings dialog only — it applies to
+            every game, unlike the program path below it. */}
 
         <div className="mt-3 border-t border-ink-800 pt-2.5">
           <div className="mb-1 flex items-center justify-between gap-2">
