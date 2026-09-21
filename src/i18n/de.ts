@@ -172,6 +172,42 @@ export const de = {
   "error.E_SELF_PATH": "Eigener Programmpfad nicht ermittelbar.",
   "error.unknown": "Unerwarteter Fehler.",
 
+  "info.tab.guide": "Anleitung",
+  "info.tab.licenses": "Lizenzen",
+  "info.thirdPartyTitle": "Verwendete Komponenten",
+  "info.thirdPartyBody":
+    "Das Programm baut auf Bibliotheken anderer auf, die unter ihren eigenen Lizenzen stehen. Die vollständige Liste mit allen Namensnennungen und Lizenztexten liegt als Datei neben dem Programm.",
+  "info.thirdPartyOpen": "Liste öffnen",
+  "info.thirdPartyFailed":
+    "Die Datei ließ sich nicht öffnen. Du findest sie als THIRD-PARTY-LICENSES.md im Installationsordner.",
+  "info.heading": "Über server2pick",
+  "info.title": "Anleitung",
+  "info.close": "Anleitung schließen",
+  "info.what":
+    "Valve leitet Matches nicht direkt zu einem Server, sondern über Relay-Standorte rund um die Welt. Welchen du bekommst, entscheidet das Matchmaking. server2pick sperrt die Relays einzelner Standorte in der Windows-Firewall — dann kann dich das Matchmaking dort nicht mehr hinlegen.",
+  "info.stepsTitle": "So gehst du vor",
+  "info.step1": "Spiel oben links auswählen.",
+  "info.step2":
+    "Standorte sperren, die du nicht willst — über die Liste, die Karte oder die Schnellauswahl. Die Ping-Werte zeigen dir, was sich lohnt.",
+  "info.step3":
+    "Auf „Änderungen anwenden“ drücken. Dafür braucht Windows einmalig Administratorrechte.",
+  "info.step4": "Spiel starten. Fertig.",
+  "info.notesTitle": "Das solltest du wissen",
+  "info.note1":
+    "Die Regeln liegen in der Windows-Firewall, nicht im Programm. Sie wirken weiter, wenn server2pick geschlossen ist — bis du sie hier aufhebst.",
+  "info.note2":
+    "Lass mindestens drei Standorte offen. Sperrst du zu viele, sucht das Relay-Netz Umwege und Matches brechen häufiger ab.",
+  "info.note3":
+    "Lief das Spiel schon, als du gesperrt hast, bleibt es auf seinem alten Relay. Erst ein Neustart des Spiels bringt die Sperre zur Wirkung.",
+  "info.note4":
+    "Jede Regel ist an die Spieldatei gebunden. Zieht das Spiel um oder wird neu installiert, zeigen die alten Regeln ins Leere — das Programm warnt dich und schreibt sie auf Knopfdruck neu.",
+  "info.note5":
+    "Gesperrt werden Relays, nicht die Spielserver selbst. In seltenen Fällen routet dich das Netz trotzdem in eine gesperrte Region.",
+  "info.shareTitle": "Profile und Teilen",
+  "info.shareBody":
+    "Eine Auswahl lässt sich rechts benennen und als Profil sichern. Über das Teilen-Symbol bekommst du einen Code zum Weitergeben — er enthält nur die Serverauswahl und die Profile, keine Pfade von deinem Rechner.",
+  "info.disclaimer": "Inoffiziell. Steht in keiner Verbindung zu Valve.",
+
   "prefs.title": "Einstellungen",
   "prefs.tab.general": "Allgemein",
   "prefs.tab.appearance": "Darstellung",

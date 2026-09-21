@@ -165,6 +165,42 @@ export const es: Dictionary = {
   "error.E_SELF_PATH": "No se pudo determinar la ruta del propio programa.",
   "error.unknown": "Error inesperado.",
 
+  "info.tab.guide": "Guía",
+  "info.tab.licenses": "Licencias",
+  "info.thirdPartyTitle": "Componentes utilizados",
+  "info.thirdPartyBody":
+    "La aplicación se apoya en bibliotecas de otras personas, que mantienen sus propias licencias. La lista completa, con todas las atribuciones y textos de licencia, está junto al programa como archivo.",
+  "info.thirdPartyOpen": "Abrir la lista",
+  "info.thirdPartyFailed":
+    "No se pudo abrir el archivo. Lo encontrarás como THIRD-PARTY-LICENSES.md en la carpeta de instalación.",
+  "info.heading": "Acerca de server2pick",
+  "info.title": "Guía",
+  "info.close": "Cerrar la guía",
+  "info.what":
+    "Valve no envía las partidas directamente a un servidor: pasan por ubicaciones de relé repartidas por el mundo, y el emparejamiento decide cuál te toca. server2pick bloquea los relés de ubicaciones concretas en el firewall de Windows, así el emparejamiento ya no puede colocarte allí.",
+  "info.stepsTitle": "Cómo se usa",
+  "info.step1": "Elige tu juego arriba a la izquierda.",
+  "info.step2":
+    "Bloquea las ubicaciones que no quieras, desde la lista, el mapa o la selección rápida. Los valores de ping te dicen cuáles conviene mantener.",
+  "info.step3":
+    "Pulsa «Aplicar cambios». Windows pedirá permisos de administrador una vez.",
+  "info.step4": "Inicia el juego. Ya está.",
+  "info.notesTitle": "Conviene saber",
+  "info.note1":
+    "Las reglas están en el firewall de Windows, no en la aplicación. Siguen funcionando con server2pick cerrado, hasta que las quites desde aquí.",
+  "info.note2":
+    "Deja al menos tres ubicaciones abiertas. Si bloqueas demasiadas, la red de relés busca rodeos y las partidas fallan más a menudo.",
+  "info.note3":
+    "Si el juego ya estaba abierto al bloquear, se queda en el relé por el que entró. Solo reiniciarlo hace efectivo el bloqueo.",
+  "info.note4":
+    "Cada regla está vinculada al ejecutable del juego. Si lo mueves o lo reinstalas, las reglas antiguas apuntan a la nada; la aplicación te avisa y las reescribe con un botón.",
+  "info.note5":
+    "Se bloquean relés, no los servidores de juego. En casos raros la red te lleva igualmente a una región bloqueada.",
+  "info.shareTitle": "Perfiles y compartir",
+  "info.shareBody":
+    "Una selección se puede nombrar y guardar como perfil a la derecha. El icono de compartir te da un código para pasar a otros: solo lleva la selección de servidores y los perfiles, nunca rutas de tu equipo.",
+  "info.disclaimer": "No oficial. Sin relación con Valve.",
+
   "prefs.title": "Ajustes",
   "prefs.tab.general": "General",
   "prefs.tab.appearance": "Apariencia",

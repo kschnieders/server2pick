@@ -13,6 +13,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ActiveRulesOverlay } from "./components/ActiveRulesOverlay";
 import { CloseDialog } from "./components/CloseDialog";
 import { GamePicker } from "./components/GamePicker";
+import { InfoDialog } from "./components/InfoDialog";
 import { LoadingBar } from "./components/LoadingBar";
 import { ServerList } from "./components/ServerList";
 import { Sidebar } from "./components/Sidebar";
@@ -101,6 +102,7 @@ export default function App() {
   /** Shown when live rules could catch someone off guard; see the component. */
   const [rulesOverlayOpen, setRulesOverlayOpen] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
   /** Set while the window close is held back waiting for an answer. */
   const [closeAsked, setCloseAsked] = useState(false);
 
@@ -679,6 +681,13 @@ export default function App() {
               view and never change the firewall, so they stay out of the way of
               the two buttons that do. The active map state is carried by colour
               rather than a second icon, so the row never shifts. */}
+          <IconButton onClick={() => setInfoOpen(true)} label={t("info.title")}>
+            <path
+              fill="currentColor"
+              d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm-1-13h2v2h-2V7Zm0 4h2v6h-2v-6Z"
+            />
+          </IconButton>
+
           <IconButton onClick={() => setPrefsOpen(true)} label={t("prefs.title")}>
             <path
               fill="currentColor"
@@ -834,6 +843,8 @@ export default function App() {
             onDismiss={() => setRulesOverlayOpen(false)}
           />
         )}
+
+        {infoOpen && <InfoDialog onClose={() => setInfoOpen(false)} />}
 
         {prefsOpen && (
           <SettingsDialog

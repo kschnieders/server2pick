@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { disable, enable, isEnabled } from "@tauri-apps/plugin-autostart";
 import type { CloseAction, Settings } from "../api";
 import { LANGUAGES, languageName, useT, type TranslationKey } from "../i18n";
+import { BACKDROP_IN, CARD_IN } from "../lib/overlay-animation";
 
 type Props = {
   settings: Settings;
@@ -117,10 +118,12 @@ export function SettingsDialog({
   return (
     <div
       className="absolute inset-0 z-50 grid place-items-center bg-ink-950/80 backdrop-blur-sm"
+      style={BACKDROP_IN}
       onClick={onClose}
     >
       <div
         className="max-h-[85vh] w-[30rem] max-w-[92vw] overflow-y-auto rounded-xl border border-ink-800 bg-ink-900 p-5 shadow-2xl shadow-black/60"
+        style={CARD_IN}
         onClick={(e) => e.stopPropagation()}
       >
         <header className="mb-2 flex items-center justify-between">

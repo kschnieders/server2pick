@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import type { Pop } from "../api";
 import { WORLD_PATH } from "../data/world";
 import { useT } from "../i18n";
+import { BACKDROP_IN } from "../lib/overlay-animation";
 import { VIEW_HEIGHT, VIEW_TOP, projectX, projectY } from "./WorldMap";
 
 type Props = {
@@ -50,11 +51,13 @@ export function ActiveRulesOverlay({
   return (
     <div
       className="absolute inset-0 z-50 grid place-items-center bg-ink-950/75 backdrop-blur-md"
-      style={{ animation: "overlay-backdrop-in 380ms ease-out both" }}
+      style={BACKDROP_IN}
       onClick={onDismiss}
     >
       <div
         className="w-[34rem] max-w-[92vw] overflow-hidden rounded-2xl border border-rose-glow/30 bg-ink-900 shadow-2xl shadow-black/70"
+        // Slower than the dialogs on purpose: this one is a statement, not a
+        // panel someone opened, and the map underneath needs the extra beat.
         style={{
           animation: "overlay-card-in 560ms cubic-bezier(0.16, 0.8, 0.24, 1) 120ms both",
         }}

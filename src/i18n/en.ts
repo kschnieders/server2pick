@@ -164,6 +164,42 @@ export const en: Dictionary = {
   "error.E_SELF_PATH": "Could not determine this program's own path.",
   "error.unknown": "Unexpected error.",
 
+  "info.tab.guide": "Guide",
+  "info.tab.licenses": "Licenses",
+  "info.thirdPartyTitle": "Components used",
+  "info.thirdPartyBody":
+    "This app is built on libraries by other people, which stay under their own licenses. The full list with every attribution and license text sits next to the program as a file.",
+  "info.thirdPartyOpen": "Open the list",
+  "info.thirdPartyFailed":
+    "The file could not be opened. You will find it as THIRD-PARTY-LICENSES.md in the installation folder.",
+  "info.heading": "About server2pick",
+  "info.title": "Guide",
+  "info.close": "Close the guide",
+  "info.what":
+    "Valve does not send matches straight to a server — they travel through relay locations around the world, and matchmaking picks which one you get. server2pick blocks the relays of individual locations in the Windows firewall, so matchmaking can no longer put you there.",
+  "info.stepsTitle": "How to use it",
+  "info.step1": "Pick your game in the top left.",
+  "info.step2":
+    "Block the locations you do not want — from the list, the map or the quick select. The ping readings show what is worth keeping.",
+  "info.step3":
+    "Press “Apply changes”. Windows asks for administrator rights once.",
+  "info.step4": "Start the game. That is it.",
+  "info.notesTitle": "Worth knowing",
+  "info.note1":
+    "The rules live in the Windows firewall, not in this app. They keep working while server2pick is closed — until you lift them here.",
+  "info.note2":
+    "Keep at least three locations open. Block too many and the relay network starts routing around them, so matches fail to confirm more often.",
+  "info.note3":
+    "If the game was already running when you blocked, it stays on the relay it came in through. Only restarting the game makes the block bite.",
+  "info.note4":
+    "Every rule is bound to the game executable. Move or reinstall the game and the old rules point nowhere — the app warns you and rewrites them at the press of a button.",
+  "info.note5":
+    "What gets blocked are relays, not the game servers themselves. In rare cases the network still routes you into a blocked region.",
+  "info.shareTitle": "Profiles and sharing",
+  "info.shareBody":
+    "A selection can be named and saved as a profile on the right. The share icon gives you a code to pass on — it carries only the server selection and the profiles, never paths from your machine.",
+  "info.disclaimer": "Unofficial. Not affiliated with Valve.",
+
   "prefs.title": "Settings",
   "prefs.tab.general": "General",
   "prefs.tab.appearance": "Appearance",
