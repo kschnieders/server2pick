@@ -115,14 +115,35 @@ jobs:
           includeUpdaterJson: true
           # Englisch, im Gegensatz zum Rest dieser Datei: diesen Text lesen die
           # Leute auf der Releases-Seite, nicht wir.
+          # Written for the Releases page, so it answers the three questions
+          # people actually arrive with: which file, what Windows will say, and
+          # what it needs to run. The updater artifacts sit in the same asset
+          # list and look like something to download, hence the note.
           releaseBody: |
-            **Installer:** `server2pick_${{ steps.version.outputs.number }}_x64-setup.exe`
+            ### Download
 
-            Windows says "Unknown publisher" on first launch — the app is not
-            code signed, and signing it would take a bought certificate. Carry
-            on via *More info → Run anyway*.
+            👉 **[server2pick_${{ steps.version.outputs.number }}_x64-setup.exe](https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.tag }}/server2pick_${{ steps.version.outputs.number }}_x64-setup.exe)**
 
-            Blocking asks for administrator rights once. Measuring ping works
-            without them.
+            That is the only file you need. The `.sig` and `latest.json` next to
+            it belong to the built-in updater.
+
+            ### First launch
+
+            Windows will show "Unknown publisher". The app is not code signed,
+            so click **More info**, then **Run anyway**.
+
+            ### Good to know
+
+            Measuring ping works right away. Blocking servers writes Windows
+            Firewall rules, so it asks for administrator rights once.
+
+            Runs on Windows 10 and 11. Supports Deadlock, Counter-Strike 2,
+            Dota 2 and Team Fortress 2.
+
+            ---
+
+            > "Have fun, and better pings."
+            >
+            > – Kay
           releaseDraft: false
           prerelease: false
