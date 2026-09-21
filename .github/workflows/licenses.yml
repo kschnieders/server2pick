@@ -1,0 +1,93 @@
+name: Lizenzliste
+
+# Zieht THIRD-PARTY-LICENSES.md nach. Bewusst nur von Hand: Actions > Lizenzliste
+# > "Run workflow". Nichts passiert ungefragt, und auf main landet kein Commit,
+# den du nicht selbst angestoßen hast.
+#
+# Anstoßen lohnt, wenn sich Abhängigkeiten geändert haben, also nach einem
+# npm install oder einer Änderung an Cargo.toml. Hat sich nichts geändert,
+# endet der Lauf ohne Commit.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    # Dieselbe Plattform wie das Release: welche Crates überhaupt gebaut werden,
+    # hängt vom Ziel ab, und damit auch, welche in der Liste stehen.
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust-Cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Abhängigkeiten installieren
+        run: npm ci
+
+      - name: Crates entpacken
+        # Der Generator liest die entpackten Quellen aus dem Registry-Cache, um
+        # an LICENSE- und NOTICE-Dateien zu kommen. Ein blosses `cargo fetch`
+        # lädt nur die Archive, deshalb hier ein echter Check-Durchlauf.
+        run: cargo check --manifest-path src-tauri/Cargo.toml --quiet
+
+      - name: Liste erzeugen
+        run: node scripts/third-party-licenses.mjs
+
+      - name: Ergebnis auf Plausibilität prüfen
+        shell: bash
+        # Schutz gegen eine stumme Fehlgeburt: wenn der Registry-Cache nicht
+        # bereitsteht, landet fast alles unter "nicht auflösbar" und die Datei
+        # wäre wertlos. So ein Ergebnis darf nicht committet werden.
+        run: |
+          total=$(grep -cE '^\| [^|]+ \| [^|]+ \| ' THIRD-PARTY-LICENSES.md || true)
+          unresolved=$(sed -n '/^## Not resolved locally/,/^## /p' THIRD-PARTY-LICENSES.md | grep -c '^- ' || true)
+          echo "aufgelöst: $total, nicht auflösbar: $unresolved"
+          if [ "$total" -lt 100 ]; then
+            echo "::error::Nur $total Komponenten erfasst. Der Registry-Cache war offenbar nicht bereit."
+            exit 1
+          fi
+          if [ "$unresolved" -gt $(( total / 4 )) ]; then
+            echo "::error::$unresolved von $total Komponenten nicht auflösbar. Das sieht nach einem kaputten Lauf aus."
+            exit 1
+          fi
+
+      - name: Änderung committen
+        shell: bash
+        # Bei einem Lauf von Hand willst du das Ergebnis sehen, ohne durch die
+        # Protokolle zu scrollen — deshalb landet es in der Zusammenfassung.
+        run: |
+          if git diff --quiet -- THIRD-PARTY-LICENSES.md; then
+            echo "Liste ist bereits aktuell."
+            echo "### Nichts zu tun" >> "$GITHUB_STEP_SUMMARY"
+            echo "Die Lizenzliste war schon auf dem neuesten Stand." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          {
+            echo "### Lizenzliste aktualisiert"
+            echo ""
+            echo '```'
+            git diff --stat -- THIRD-PARTY-LICENSES.md
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add THIRD-PARTY-LICENSES.md
+          git commit -m "Third-party license list regenerated"
+          # Falls in der Zwischenzeit jemand gepusht hat.
+          git pull --rebase
+          git push
